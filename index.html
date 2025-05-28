@@ -297,6 +297,7 @@
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
             padding: 30px;
+            text-align: center;
         }
         
         .login-title {
@@ -314,6 +315,7 @@
             margin-bottom: 8px;
             font-weight: 600;
             color: var(--dark-color);
+            text-align: left;
         }
         
         .form-input {
@@ -327,16 +329,6 @@
         .form-input:focus {
             outline: none;
             border-color: var(--primary-color);
-        }
-        
-        .remember {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        .remember input {
-            margin-right: 8px;
         }
         
         .hidden {
@@ -361,6 +353,16 @@
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
             display: none;
+        }
+        
+        .simple-login {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            cursor: pointer;
+            font-weight: 600;
+            padding: 5px;
+            text-decoration: underline;
         }
         
         @media (max-width: 768px) {
@@ -395,7 +397,7 @@
                 <div class="user-card">
                     <div class="avatar" id="userAvatar">U</div>
                     <h3 id="username">Гость</h3>
-                    <p id="userEmail">Войдите, чтобы сохранять свой выбор</p>
+                    <p id="userEmail">Введите имя для сохранения прогресса</p>
                 </div>
                 
                 <div class="progress-section">
@@ -431,25 +433,20 @@
             </div>
         </main>
         
-        <div id="loginContainer" class="login-container hidden">
-            <h2 class="login-title">Авторизация</h2>
+        <div id="loginContainer" class="login-container">
+            <h2 class="login-title">Простой вход</h2>
             <div class="form-group">
-                <label class="form-label">Логин</label>
-                <input type="text" class="form-input" id="loginInput" placeholder="Введите ваш логин">
+                <label class="form-label">Ваше имя</label>
+                <input type="text" class="form-input" id="loginInput" placeholder="Введите ваше имя" autofocus>
             </div>
-            <div class="form-group">
-                <label class="form-label">Пароль</label>
-                <input type="password" class="form-input" id="passwordInput" placeholder="Введите ваш пароль">
+            <button class="btn btn-primary" id="loginBtn" style="width: 100%;">Продолжить</button>
+            <div style="margin-top: 20px;">
+                <p>Можно работать без сохранения: <button class="simple-login" id="guestBtn">Продолжить как гость</button></p>
             </div>
-            <div class="remember">
-                <input type="checkbox" id="rememberMe">
-                <label for="rememberMe">Запомнить меня</label>
-            </div>
-            <button class="btn btn-primary" id="loginBtn" style="width: 100%;">Войти</button>
         </div>
         
         <footer>
-            <p>© 2025 Походный чек-лист</p>
+            <p>© 2025 Походный чек-лист | Куку</p>
         </footer>
         
         <div class="save-status" id="saveStatus">Данные сохранены!</div>
@@ -582,9 +579,8 @@
         const mainContent = document.getElementById('mainContent');
         const loginContainer = document.getElementById('loginContainer');
         const loginInput = document.getElementById('loginInput');
-        const passwordInput = document.getElementById('passwordInput');
         const loginBtn = document.getElementById('loginBtn');
-        const registerLink = document.getElementById('registerLink');
+        const guestBtn = document.getElementById('guestBtn');
         const usernameDisplay = document.getElementById('username');
         const userEmailDisplay = document.getElementById('userEmail');
         const userAvatar = document.getElementById('userAvatar');
@@ -601,7 +597,7 @@
             
             // Обработчики событий
             loginBtn.addEventListener('click', handleLogin);
-            registerLink.addEventListener('click', handleRegister);
+            guestBtn.addEventListener('click', handleGuestLogin);
         }
 
         // Загрузка состояния из localStorage
@@ -626,17 +622,14 @@
         // Обработка входа
         function handleLogin() {
             const login = loginInput.value.trim();
-            const password = passwordInput.value.trim();
             
-            if (!login || !password) {
-                alert('Пожалуйста, введите логин и пароль');
+            if (!login) {
+                alert('Пожалуйста, введите ваше имя');
                 return;
             }
             
-            // В этом демо просто сохраняем пользователя
             appState.user = {
                 username: login,
-                email: `${login}@example.com`,
                 initials: login.charAt(0).toUpperCase()
             };
             
@@ -649,10 +642,10 @@
             renderUI();
         }
 
-        // Обработка регистрации
-        function handleRegister(e) {
-            e.preventDefault();
-            alert('В демо-версии регистрация не реализована. Используйте любой логин и пароль для входа.');
+        // Обработка входа как гостя
+        function handleGuestLogin() {
+            appState.user = null;
+            renderUI();
         }
 
         // Обработка выхода
@@ -665,7 +658,7 @@
         // Переключение состояния элемента
         function toggleItem(itemId, category) {
             if (!appState.user) {
-                alert('Пожалуйста, войдите, чтобы сохранять свой выбор');
+                alert('Войдите или введите имя, чтобы сохранять свой выбор');
                 return;
             }
             
@@ -680,7 +673,7 @@
         // Переключение всей категории
         function toggleCategory(categoryId, selectAll) {
             if (!appState.user) {
-                alert('Пожалуйста, войдите, чтобы сохранять свой выбор');
+                alert('Войдите или введите имя, чтобы сохранять свой выбор');
                 return;
             }
             
@@ -698,16 +691,13 @@
 
         // Обновление прогресса
         function updateProgress() {
-            if (!appState.user) return;
-            
-            const userSelections = appState.selectedItems[appState.user.username];
             let selected = 0;
             let total = 0;
             
             checklistData.forEach(category => {
                 category.items.forEach(item => {
                     total++;
-                    if (userSelections[item.id]) {
+                    if (appState.user && appState.selectedItems[appState.user.username]?.[item.id]) {
                         selected++;
                     }
                 });
@@ -729,7 +719,8 @@
             itemsContainer.innerHTML = '';
             
             category.items.forEach(item => {
-                const isSelected = appState.user && appState.selectedItems[appState.user.username][item.id];
+                const isSelected = appState.user && 
+                                   appState.selectedItems[appState.user.username]?.[item.id];
                 
                 const itemElement = document.createElement('div');
                 itemElement.className = 'item-card';
@@ -756,7 +747,7 @@
                 
                 // Обновляем информацию о пользователе
                 usernameDisplay.textContent = appState.user.username;
-                userEmailDisplay.textContent = appState.user.email;
+                userEmailDisplay.textContent = `Данные сохраняются как "${appState.user.username}"`;
                 userAvatar.textContent = appState.user.initials;
                 
                 // Обновляем кнопки авторизации
@@ -773,7 +764,7 @@
                 renderChecklist();
                 updateProgress();
             } else {
-                // Пользователь не авторизован
+                // Гостевой режим
                 loginContainer.classList.remove('hidden');
                 mainContent.classList.add('hidden');
                 
@@ -789,6 +780,7 @@
                 
                 document.getElementById('showLoginBtn').addEventListener('click', () => {
                     loginContainer.classList.remove('hidden');
+                    loginInput.focus();
                 });
             }
         }
