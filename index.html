@@ -396,8 +396,8 @@
             <div class="sidebar">
                 <div class="user-card">
                     <div class="avatar" id="userAvatar">U</div>
-                    <!-- <h3 id="username">Гость</h3> -->
-                    <!-- <p id="userEmail">Введите имя для сохранения прогресса</p> -->
+                    <h3 id="username">Гость</h3>
+                    <p id="userEmail">Введите имя для сохранения прогресса</p>
                 </div>
                 
                 <div class="progress-section">
@@ -441,7 +441,7 @@
             </div>
             <button class="btn btn-primary" id="loginBtn" style="width: 100%;">Продолжить</button>
             <div style="margin-top: 20px;">
-                <!-- <p>Можно работать без сохранения: <button class="simple-login" id="guestBtn">Продолжить как гость</button></p> -->
+                <p>Можно работать без сохранения: <button class="simple-login" id="guestBtn">Продолжить как гость</button></p>
             </div>
         </div>
         
@@ -747,7 +747,7 @@
                 
                 // Обновляем информацию о пользователе
                 usernameDisplay.textContent = appState.user.username;
-                // userEmailDisplay.textContent = `Данные сохраняются как "${appState.user.username}"`;
+                userEmailDisplay.textContent = `Данные сохраняются как "${appState.user.username}"`;
                 userAvatar.textContent = appState.user.initials;
                 
                 // Обновляем кнопки авторизации
@@ -770,7 +770,7 @@
                 
                 // Обновляем информацию о пользователе
                 usernameDisplay.textContent = 'Гость';
-                // userEmailDisplay.textContent = 'Войдите, чтобы сохранять свой выбор';
+                userEmailDisplay.textContent = 'Войдите, чтобы сохранять свой выбор';
                 userAvatar.textContent = 'G';
                 
                 // Обновляем кнопки авторизации
