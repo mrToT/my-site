@@ -355,14 +355,53 @@
             display: none;
         }
         
-        .simple-login {
+        .user-list {
+            margin: 20px 0;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: var(--border-radius);
+            padding: 10px;
+        }
+        
+        .user-item {
+            padding: 10px;
+            cursor: pointer;
+            border-radius: var(--border-radius);
+            margin-bottom: 5px;
+            text-align: left;
+            transition: background-color 0.2s;
+        }
+        
+        .user-item:hover {
+            background-color: #ebf8ff;
+        }
+        
+        .user-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .user-initials {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            margin-right: 10px;
+        }
+        
+        .switch-user {
+            margin-top: 20px;
             background: none;
             border: none;
             color: var(--primary-color);
             cursor: pointer;
             font-weight: 600;
-            padding: 5px;
             text-decoration: underline;
+            font-size: 14px;
         }
         
         @media (max-width: 768px) {
@@ -392,12 +431,13 @@
             </div>
         </header>
         
-        <main id="mainContent">
+        <main id="mainContent" class="hidden">
             <div class="sidebar">
                 <div class="user-card">
                     <div class="avatar" id="userAvatar">U</div>
-                    <h3 id="username">Гость</h3>
-                    <p id="userEmail">Введите имя для сохранения прогресса</p>
+                    <h3 id="username">Пользователь</h3>
+                    <p id="userEmail">Прогресс сохранен</p>
+                    <button class="switch-user" id="switchUserBtn">Сменить пользователя</button>
                 </div>
                 
                 <div class="progress-section">
@@ -434,15 +474,17 @@
         </main>
         
         <div id="loginContainer" class="login-container">
-            <h2 class="login-title">Простой вход</h2>
+            <h2 class="login-title">Выберите профиль</h2>
+            
+            <div class="user-list" id="userList">
+                <!-- Список пользователей будет здесь -->
+            </div>
+            
             <div class="form-group">
-                <label class="form-label">Ваше имя</label>
+                <label class="form-label">Или введите новое имя:</label>
                 <input type="text" class="form-input" id="loginInput" placeholder="Введите ваше имя" autofocus>
             </div>
             <button class="btn btn-primary" id="loginBtn" style="width: 100%;">Продолжить</button>
-            <div style="margin-top: 20px;">
-                <p>Можно работать без сохранения: <button class="simple-login" id="guestBtn">Продолжить как гость</button></p>
-            </div>
         </div>
         
         <footer>
@@ -570,8 +612,9 @@
 
         // Состояние приложения
         let appState = {
-            user: null,
-            selectedItems: {}
+            currentUser: null,
+            selectedItems: {},
+            userProfiles: [] // Список всех использованных профилей
         };
 
         // DOM элементы
@@ -580,24 +623,25 @@
         const loginContainer = document.getElementById('loginContainer');
         const loginInput = document.getElementById('loginInput');
         const loginBtn = document.getElementById('loginBtn');
-        const guestBtn = document.getElementById('guestBtn');
+        const userList = document.getElementById('userList');
         const usernameDisplay = document.getElementById('username');
-        const userEmailDisplay = document.getElementById('userEmail');
         const userAvatar = document.getElementById('userAvatar');
         const checklistContent = document.getElementById('checklistContent');
         const progressFill = document.getElementById('progressFill');
         const selectedItemsCount = document.getElementById('selectedItems');
         const totalItemsCount = document.getElementById('totalItems');
         const saveStatus = document.getElementById('saveStatus');
+        const switchUserBtn = document.getElementById('switchUserBtn');
 
         // Инициализация приложения
         function initApp() {
             loadState();
+            renderUserList();
             renderUI();
             
             // Обработчики событий
             loginBtn.addEventListener('click', handleLogin);
-            guestBtn.addEventListener('click', handleGuestLogin);
+            switchUserBtn.addEventListener('click', showLoginScreen);
         }
 
         // Загрузка состояния из localStorage
@@ -628,12 +672,20 @@
                 return;
             }
             
-            appState.user = {
+            // Создаем/обновляем профиль
+            const userProfile = {
                 username: login,
                 initials: login.charAt(0).toUpperCase()
             };
             
-            // Если пользователь новый, инициализируем его выбор
+            appState.currentUser = userProfile;
+            
+            // Добавляем в список профилей, если его там нет
+            if (!appState.userProfiles.some(profile => profile.username === login)) {
+                appState.userProfiles.push(userProfile);
+            }
+            
+            // Инициализируем выбор пользователя, если он новый
             if (!appState.selectedItems[login]) {
                 appState.selectedItems[login] = {};
             }
@@ -642,27 +694,64 @@
             renderUI();
         }
 
-        // Обработка входа как гостя
-        function handleGuestLogin() {
-            appState.user = null;
-            renderUI();
+        // Выбор существующего пользователя
+        function selectUser(username) {
+            const userProfile = appState.userProfiles.find(profile => profile.username === username);
+            if (userProfile) {
+                appState.currentUser = userProfile;
+                saveState();
+                renderUI();
+            }
+        }
+
+        // Показать экран входа
+        function showLoginScreen() {
+            appState.currentUser = null;
+            renderUserList();
+            loginContainer.classList.remove('hidden');
+            mainContent.classList.add('hidden');
         }
 
         // Обработка выхода
         function handleLogout() {
-            appState.user = null;
+            appState.currentUser = null;
             saveState();
-            renderUI();
+            showLoginScreen();
+        }
+
+        // Рендер списка пользователей
+        function renderUserList() {
+            userList.innerHTML = '';
+            
+            if (appState.userProfiles.length > 0) {
+                userList.innerHTML = '<p style="text-align: left; margin-bottom: 10px;">Выберите профиль:</p>';
+                
+                appState.userProfiles.forEach(profile => {
+                    const userItem = document.createElement('div');
+                    userItem.className = 'user-item';
+                    userItem.innerHTML = `
+                        <div>
+                            <span class="user-initials">${profile.initials}</span>
+                            <span>${profile.username}</span>
+                        </div>
+                    `;
+                    userItem.addEventListener('click', () => selectUser(profile.username));
+                    userList.appendChild(userItem);
+                });
+            } else {
+                userList.innerHTML = '<p>Нет сохраненных профилей</p>';
+            }
         }
 
         // Переключение состояния элемента
         function toggleItem(itemId, category) {
-            if (!appState.user) {
-                alert('Войдите или введите имя, чтобы сохранять свой выбор');
+            if (!appState.currentUser) {
+                alert('Пожалуйста, войдите');
                 return;
             }
             
-            const userSelections = appState.selectedItems[appState.user.username];
+            const username = appState.currentUser.username;
+            const userSelections = appState.selectedItems[username];
             userSelections[itemId] = !userSelections[itemId];
             
             saveState();
@@ -672,13 +761,14 @@
 
         // Переключение всей категории
         function toggleCategory(categoryId, selectAll) {
-            if (!appState.user) {
-                alert('Войдите или введите имя, чтобы сохранять свой выбор');
+            if (!appState.currentUser) {
+                alert('Пожалуйста, войдите');
                 return;
             }
             
             const category = checklistData.find(c => c.category === categoryId);
-            const userSelections = appState.selectedItems[appState.user.username];
+            const username = appState.currentUser.username;
+            const userSelections = appState.selectedItems[username];
             
             category.items.forEach(item => {
                 userSelections[item.id] = selectAll;
@@ -691,13 +781,17 @@
 
         // Обновление прогресса
         function updateProgress() {
+            if (!appState.currentUser) return;
+            
+            const username = appState.currentUser.username;
+            const userSelections = appState.selectedItems[username];
             let selected = 0;
             let total = 0;
             
             checklistData.forEach(category => {
                 category.items.forEach(item => {
                     total++;
-                    if (appState.user && appState.selectedItems[appState.user.username]?.[item.id]) {
+                    if (userSelections[item.id]) {
                         selected++;
                     }
                 });
@@ -719,8 +813,8 @@
             itemsContainer.innerHTML = '';
             
             category.items.forEach(item => {
-                const isSelected = appState.user && 
-                                   appState.selectedItems[appState.user.username]?.[item.id];
+                const isSelected = appState.currentUser && 
+                                   appState.selectedItems[appState.currentUser.username]?.[item.id];
                 
                 const itemElement = document.createElement('div');
                 itemElement.className = 'item-card';
@@ -740,20 +834,19 @@
 
         // Рендер интерфейса
         function renderUI() {
-            if (appState.user) {
+            if (appState.currentUser) {
                 // Пользователь авторизован
                 loginContainer.classList.add('hidden');
                 mainContent.classList.remove('hidden');
                 
                 // Обновляем информацию о пользователе
-                usernameDisplay.textContent = appState.user.username;
-                userEmailDisplay.textContent = `Данные сохраняются как "${appState.user.username}"`;
-                userAvatar.textContent = appState.user.initials;
+                usernameDisplay.textContent = appState.currentUser.username;
+                userAvatar.textContent = appState.currentUser.initials;
                 
                 // Обновляем кнопки авторизации
                 authSection.innerHTML = `
                     <div class="user-info">
-                        <span>${appState.user.username}</span>
+                        <span>${appState.currentUser.username}</span>
                     </div>
                     <button class="btn btn-logout" id="logoutBtn">Выйти</button>
                 `;
@@ -764,24 +857,10 @@
                 renderChecklist();
                 updateProgress();
             } else {
-                // Гостевой режим
+                // Показываем экран входа
                 loginContainer.classList.remove('hidden');
                 mainContent.classList.add('hidden');
-                
-                // Обновляем информацию о пользователе
-                usernameDisplay.textContent = 'Гость';
-                userEmailDisplay.textContent = 'Войдите, чтобы сохранять свой выбор';
-                userAvatar.textContent = 'G';
-                
-                // Обновляем кнопки авторизации
-                authSection.innerHTML = `
-                    <button class="btn btn-primary" id="showLoginBtn">Войти</button>
-                `;
-                
-                document.getElementById('showLoginBtn').addEventListener('click', () => {
-                    loginContainer.classList.remove('hidden');
-                    loginInput.focus();
-                });
+                loginInput.focus();
             }
         }
 
