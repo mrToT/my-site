@@ -6,12 +6,16 @@
     <title>Походный чек-лист тихоходок</title>
 
     <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js">
+    </script>
     <!-- CryptoJS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js">
+    </script>
     <!-- SortableJS -->
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js">
+    </script>
 
     <style>
         :root {
@@ -29,7 +33,6 @@
             --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
             --shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
             --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-
             --card-hover-bg: #f0f2f5;
             --input-bg: #f8f9fc;
             --stat-bg: #f8f9fc;
@@ -37,8 +40,7 @@
             --badge-optional-text: #856404;
             --badge-required-bg: #ffe0e0;
             --badge-required-text: #b71c1c;
-
-            --modal-overlay: rgba(0,0,0,0.35);
+            --modal-overlay: rgba(0, 0, 0, 0.35);
             --category-header-bg: #fafbfc;
             --checkbox-bg: #ffffff;
             --progress-bg: #eef0f5;
@@ -55,6 +57,10 @@
             --alert-success-text: #1b5e20;
             --default-badge-bg: #e5e7eb;
             --default-badge-text: #1a1a2e;
+            --admin-badge-bg: #d4e4ff;
+            --admin-badge-text: #1a3f8a;
+            --shared-badge-bg: #e8f5e9;
+            --shared-badge-text: #1b5e20;
         }
 
         body.dark {
@@ -63,8 +69,8 @@
             --text: #e0e0e0;
             --text-light: #a0a0b0;
             --border: #2a2a4a;
-            --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
-            --shadow: 0 8px 24px rgba(0,0,0,0.4);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+            --shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
             --card-hover-bg: #1f2b47;
             --input-bg: #1f2b47;
             --stat-bg: #1f2b47;
@@ -72,7 +78,7 @@
             --badge-optional-text: #ffd54f;
             --badge-required-bg: #4a2020;
             --badge-required-text: #ff8a80;
-            --modal-overlay: rgba(0,0,0,0.7);
+            --modal-overlay: rgba(0, 0, 0, 0.7);
             --category-header-bg: #1f2b47;
             --checkbox-bg: #16213e;
             --progress-bg: #2a2a4a;
@@ -89,9 +95,17 @@
             --alert-success-text: #7ddf90;
             --default-badge-bg: #2a2a4a;
             --default-badge-text: #c0c0d0;
+            --admin-badge-bg: #1a2f5a;
+            --admin-badge-text: #8ab4ff;
+            --shared-badge-bg: #1b3a2a;
+            --shared-badge-text: #7ddf90;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
             font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
@@ -125,1353 +139,2385 @@
             flex-wrap: wrap;
             gap: 12px;
         }
-        .logo { font-size: 1.5rem; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px; }
-        .logo span { font-size: 1.8rem; }
-        .header-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: -0.5px;
+        }
+        .logo span {
+            font-size: 1.8rem;
+        }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
 
         .btn {
-            padding: 10px 18px; border: none; border-radius: 10px; cursor: pointer;
-            font-weight: 600; font-size: 0.9rem; transition: var(--transition);
-            display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
-            background: transparent; color: var(--text);
+            padding: 10px 18px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+            background: transparent;
+            color: var(--text);
         }
-        .btn-sm { padding: 6px 12px; font-size: 0.8rem; border-radius: 8px; }
-        .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 4px 12px rgba(79,124,255,0.3); }
-        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
-        .btn-accent { background: var(--accent); color: #fff; box-shadow: 0 4px 12px rgba(52,199,89,0.3); }
-        .btn-accent:hover { background: #2eb150; transform: translateY(-1px); }
-        .btn-danger { background: var(--danger); color: #fff; box-shadow: 0 4px 12px rgba(255,59,48,0.3); }
-        .btn-danger:hover { background: var(--danger-hover); transform: translateY(-1px); }
-        .btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--text); }
-        .btn-outline:hover { background: var(--card-hover-bg); }
-        .btn-ghost { background: transparent; color: var(--text-light); padding: 6px 10px; }
-        .btn-ghost:hover { background: var(--card-hover-bg); color: var(--primary); }
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            border-radius: 8px;
+        }
+        .btn-xs {
+            padding: 3px 8px;
+            font-size: 0.7rem;
+            border-radius: 6px;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(79, 124, 255, 0.3);
+        }
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+        .btn-accent {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(52, 199, 89, 0.3);
+        }
+        .btn-accent:hover {
+            background: #2eb150;
+            transform: translateY(-1px);
+        }
+        .btn-danger {
+            background: var(--danger);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(255, 59, 48, 0.3);
+        }
+        .btn-danger:hover {
+            background: var(--danger-hover);
+            transform: translateY(-1px);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid var(--border);
+            color: var(--text);
+        }
+        .btn-outline:hover {
+            background: var(--card-hover-bg);
+        }
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-light);
+            padding: 6px 10px;
+        }
+        .btn-ghost:hover {
+            background: var(--card-hover-bg);
+            color: var(--primary);
+        }
         .btn-icon {
-            width: 36px; height: 36px; padding: 0; border-radius: 10px;
-            display: inline-flex; align-items: center; justify-content: center;
-            font-size: 1.2rem; cursor: pointer; border: none; background: transparent;
-            transition: var(--transition); color: var(--text-light);
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            transition: var(--transition);
+            color: var(--text-light);
         }
-        .btn-icon:hover { background: var(--card-hover-bg); color: var(--primary); }
+        .btn-icon:hover {
+            background: var(--card-hover-bg);
+            color: var(--primary);
+        }
 
         .sync-badge {
-            display: inline-flex; align-items: center; gap: 5px; font-size: 0.8rem; font-weight: 600;
-            padding: 5px 12px; border-radius: 20px; background: var(--card-hover-bg); color: var(--text-light);
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 5px 12px;
+            border-radius: 20px;
+            background: var(--card-hover-bg);
+            color: var(--text-light);
         }
-        .sync-badge.synced { background: var(--sync-synced-bg); color: var(--sync-synced-text); }
-        .sync-badge.pending { background: var(--sync-pending-bg); color: var(--sync-pending-text); animation: pulse 1.5s infinite; }
+        .sync-badge.synced {
+            background: var(--sync-synced-bg);
+            color: var(--sync-synced-text);
+        }
+        .sync-badge.pending {
+            background: var(--sync-pending-bg);
+            color: var(--sync-pending-text);
+            animation: pulse 1.5s infinite;
+        }
 
-        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.6;
+            }
+        }
 
-        .hidden { display: none !important; }
+        .hidden {
+            display: none !important;
+        }
 
-        main { display: flex; gap: 20px; flex: 1; }
+        main {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+        }
         .sidebar {
-            width: 320px; flex-shrink: 0; background: var(--card-bg);
-            border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow);
-            height: fit-content; position: sticky; top: 20px; align-self: flex-start;
+            width: 340px;
+            flex-shrink: 0;
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+            align-self: flex-start;
+            max-height: calc(100vh - 64px);
+            overflow-y: auto;
         }
-        .content { flex: 1; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            min-width: 0;
+        }
 
         .trip-date-section {
-            margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border);
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
         }
-        .countdown { font-size: 0.9rem; font-weight: 600; color: var(--primary); margin-top: 6px; }
+        .countdown {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-top: 6px;
+        }
 
         .search-filter-bar {
-            display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
-            background: var(--card-bg); padding: 12px 16px; border-radius: var(--radius);
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            background: var(--card-bg);
+            padding: 12px 16px;
+            border-radius: var(--radius);
             box-shadow: var(--shadow-sm);
         }
         .search-input {
-            flex: 1; min-width: 150px; padding: 8px 12px; border-radius: 8px;
-            border: 1px solid var(--border); background: var(--input-bg); color: var(--text);
-            font-size: 0.9rem; outline: none; transition: var(--transition);
+            flex: 1;
+            min-width: 150px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--input-bg);
+            color: var(--text);
+            font-size: 0.9rem;
+            outline: none;
+            transition: var(--transition);
         }
-        .search-input:focus { border-color: var(--primary); }
+        .search-input:focus {
+            border-color: var(--primary);
+        }
         .filter-select {
-            padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border);
-            background: var(--input-bg); color: var(--text); font-size: 0.85rem;
-            cursor: pointer; outline: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--input-bg);
+            color: var(--text);
+            font-size: 0.85rem;
+            cursor: pointer;
+            outline: none;
         }
 
-        .progress-section h4 { font-size: 0.95rem; margin-bottom: 8px; }
-        .progress-bar { height: 8px; background: var(--progress-bg); border-radius: 10px; overflow: hidden; margin: 10px 0; }
-        .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.5s ease; border-radius: 10px; }
-        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .stat-card { background: var(--stat-bg); padding: 14px; border-radius: 12px; text-align: center; }
-        .stat-value { font-size: 1.8rem; font-weight: 700; color: var(--primary); }
-        .stat-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-light); }
+        .progress-section h4 {
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+        }
+        .progress-bar {
+            height: 8px;
+            background: var(--progress-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .stat-card {
+            background: var(--stat-bg);
+            padding: 14px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .stat-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-light);
+        }
 
         .shared-session-box {
-            margin-top: 16px; padding: 14px; background: var(--stat-bg); border-radius: 12px;
+            margin-top: 16px;
+            padding: 14px;
+            background: var(--stat-bg);
+            border-radius: 12px;
+            border: 2px solid var(--accent);
+        }
+        .shared-session-box h4 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         .participant-row {
-            display: flex; justify-content: space-between; align-items: center; margin: 6px 0;
-            padding: 6px 10px; background: var(--card-bg); border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 6px 0;
+            padding: 8px 10px;
+            background: var(--card-bg);
+            border-radius: 8px;
+            flex-wrap: wrap;
+            gap: 6px;
         }
-        .participant-name { font-weight: 600; }
-        .participant-progress { font-size: 0.85rem; color: var(--text-light); }
+        .participant-name {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .participant-progress {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+        .role-badge {
+            font-size: 0.65rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .role-admin {
+            background: var(--admin-badge-bg);
+            color: var(--admin-badge-text);
+        }
+        .role-participant {
+            background: var(--default-badge-bg);
+            color: var(--default-badge-text);
+        }
+        .shared-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.75rem;
+            padding: 3px 10px;
+            border-radius: 12px;
+            background: var(--shared-badge-bg);
+            color: var(--shared-badge-text);
+            font-weight: 600;
+        }
 
         .category-card {
-            background: var(--card-bg); border-radius: var(--radius);
-            box-shadow: var(--shadow-sm); overflow: hidden; transition: var(--transition);
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            transition: var(--transition);
         }
         .category-header {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 14px 20px; cursor: pointer; user-select: none;
-            background: var(--category-header-bg); border-bottom: 1px solid transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 20px;
+            cursor: pointer;
+            user-select: none;
+            background: var(--category-header-bg);
+            border-bottom: 1px solid transparent;
         }
-        .category-header:hover { background: var(--card-hover-bg); }
-        .category-card.expanded .category-header { border-bottom-color: var(--border); }
-        .category-title { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.05rem; }
-        .category-progress { font-size: 0.8rem; color: var(--text-light); margin-left: auto; margin-right: 12px; white-space: nowrap; }
-        .collapse-icon { transition: transform 0.3s ease; font-size: 1.1rem; color: var(--text-light); }
-        .category-card.expanded .collapse-icon { transform: rotate(180deg); }
-        .items-wrapper { max-height: 0; overflow: hidden; transition: max-height 0.4s ease, padding 0.3s ease; }
-        .category-card.expanded .items-wrapper { max-height: 5000px; padding: 16px 20px; }
-        .items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 10px; }
+        .category-header:hover {
+            background: var(--card-hover-bg);
+        }
+        .category-card.expanded .category-header {
+            border-bottom-color: var(--border);
+        }
+        .category-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            flex: 1;
+            min-width: 0;
+        }
+        .category-progress {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-left: auto;
+            margin-right: 12px;
+            white-space: nowrap;
+        }
+        .category-actions {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+        .collapse-icon {
+            transition: transform 0.3s ease;
+            font-size: 1.1rem;
+            color: var(--text-light);
+        }
+        .category-card.expanded .collapse-icon {
+            transform: rotate(180deg);
+        }
+        .items-wrapper {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.3s ease;
+        }
+        .category-card.expanded .items-wrapper {
+            max-height: 5000px;
+            padding: 16px 20px;
+        }
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 10px;
+        }
         .item-card {
-            display: flex; align-items: center; padding: 10px 14px; border-radius: 10px;
-            background: var(--card-hover-bg); cursor: grab; transition: var(--transition);
-            gap: 10px; position: relative; border: 1px solid transparent;
+            display: flex;
+            align-items: center;
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: var(--card-hover-bg);
+            cursor: grab;
+            transition: var(--transition);
+            gap: 10px;
+            position: relative;
+            border: 1px solid transparent;
         }
-        .item-card:active { cursor: grabbing; }
-        .item-card:hover { background: var(--item-hover-bg); border-color: var(--item-hover-border); }
+        .item-card:active {
+            cursor: grabbing;
+        }
+        .item-card:hover {
+            background: var(--item-hover-bg);
+            border-color: var(--item-hover-border);
+        }
         .item-checkbox {
-            width: 22px; height: 22px; border: 2px solid #cbd5e0; border-radius: 6px;
-            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-            font-size: 0.8rem; background: var(--checkbox-bg); transition: var(--transition);
+            width: 22px;
+            height: 22px;
+            border: 2px solid #cbd5e0;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 0.8rem;
+            background: var(--checkbox-bg);
+            transition: var(--transition);
+            cursor: pointer;
         }
-        .item-checkbox.checked { background: var(--primary); border-color: var(--primary); color: #fff; }
-        .item-text { flex: 1; min-width: 0; word-break: break-word; font-size: 0.95rem; }
+        .item-checkbox.checked {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+        }
+        .item-text {
+            flex: 1;
+            min-width: 0;
+            word-break: break-word;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
         .weight-badge {
-            font-size: 0.7rem; margin-left: 6px; color: var(--text-light);
-            cursor: pointer; display: inline-flex; align-items: center; gap: 2px;
-            background: var(--stat-bg); padding: 2px 6px; border-radius: 12px;
+            font-size: 0.7rem;
+            margin-left: 6px;
+            color: var(--text-light);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            background: var(--stat-bg);
+            padding: 2px 6px;
+            border-radius: 12px;
+            flex-shrink: 0;
         }
-        .weight-badge:hover { background: var(--primary); color: #fff; }
-        .item-badge { font-size: 0.7rem; padding: 3px 8px; border-radius: 20px; font-weight: 600; flex-shrink: 0; }
-        .badge-optional { background: var(--badge-optional-bg); color: var(--badge-optional-text); }
-        .badge-required { background: var(--badge-required-bg); color: var(--badge-required-text); }
-        .badge-default { font-size: 0.65rem; padding: 2px 6px; border-radius: 20px; background: var(--default-badge-bg); color: var(--default-badge-text); }
-        .item-delete-btn { opacity: 0; transition: opacity 0.2s; flex-shrink: 0; color: var(--danger); font-size: 1.1rem; }
-        .item-card:hover .item-delete-btn { opacity: 1; }
-        .sortable-ghost { opacity: 0.4; background: #d0d8ff; }
+        .weight-badge:hover {
+            background: var(--primary);
+            color: #fff;
+        }
+        .item-badge {
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        .badge-optional {
+            background: var(--badge-optional-bg);
+            color: var(--badge-optional-text);
+        }
+        .badge-required {
+            background: var(--badge-required-bg);
+            color: var(--badge-required-text);
+        }
+        .badge-default {
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            border-radius: 20px;
+            background: var(--default-badge-bg);
+            color: var(--default-badge-text);
+        }
+        .item-delete-btn {
+            opacity: 0;
+            transition: opacity 0.2s;
+            flex-shrink: 0;
+            color: var(--danger);
+            font-size: 1.1rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 4px;
+            border-radius: 6px;
+        }
+        .item-card:hover .item-delete-btn {
+            opacity: 1;
+        }
+        .item-delete-btn:hover {
+            background: rgba(255, 59, 48, 0.1);
+        }
+        .sortable-ghost {
+            opacity: 0.4;
+            background: #d0d8ff;
+        }
 
-        .add-item-btn, .add-category-btn {
-            display: flex; align-items: center; gap: 6px; padding: 10px 14px;
-            margin-top: 12px; border: 2px dashed var(--border); border-radius: 10px;
-            cursor: pointer; color: var(--text-light); font-size: 0.85rem; transition: var(--transition);
-            background: transparent; width: 100%; justify-content: center; font-weight: 600;
+        .add-item-btn,
+        .add-category-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 14px;
+            margin-top: 12px;
+            border: 2px dashed var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            color: var(--text-light);
+            font-size: 0.85rem;
+            transition: var(--transition);
+            background: transparent;
+            width: 100%;
+            justify-content: center;
+            font-weight: 600;
         }
-        .add-item-btn:hover, .add-category-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--add-btn-hover-bg); }
+        .add-item-btn:hover,
+        .add-category-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: var(--add-btn-hover-bg);
+        }
 
         .checklist-tabs {
-            display: flex; gap: 4px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 8px;
+            display: flex;
+            gap: 4px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
         }
         .checklist-tab {
-            padding: 8px 16px; background: var(--card-hover-bg); border-radius: 20px;
-            cursor: pointer; font-size: 0.9rem; font-weight: 600; white-space: nowrap;
-            border: 1px solid transparent; color: var(--text);
+            padding: 8px 16px;
+            background: var(--card-hover-bg);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            white-space: nowrap;
+            border: 1px solid transparent;
+            color: var(--text);
+            transition: var(--transition);
         }
-        .checklist-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
-        .checklist-tab:hover:not(.active) { background: var(--border); }
+        .checklist-tab.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+        }
+        .checklist-tab.shared-tab {
+            background: var(--shared-badge-bg);
+            color: var(--shared-badge-text);
+            border: 1px dashed var(--accent);
+        }
+        .checklist-tab.shared-tab.active {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+        .checklist-tab:hover:not(.active) {
+            background: var(--border);
+        }
 
         .login-container {
-            max-width: 460px; margin: 30px auto; background: var(--card-bg);
-            border-radius: var(--radius); box-shadow: var(--shadow); padding: 32px 28px; width: 100%;
+            max-width: 460px;
+            margin: 30px auto;
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 32px 28px;
+            width: 100%;
         }
-        .login-title { text-align: center; margin-bottom: 24px; font-size: 1.5rem; font-weight: 700; }
-        .form-group { margin-bottom: 16px; }
-        .form-label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.85rem; }
+        .login-title {
+            text-align: center;
+            margin-bottom: 24px;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+        }
         .form-input {
-            width: 100%; padding: 12px 16px; background: var(--input-bg);
-            border: 1.5px solid var(--border); border-radius: 10px; font-size: 0.95rem;
-            transition: var(--transition); color: var(--text); outline: none;
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--input-bg);
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            color: var(--text);
+            outline: none;
         }
-        .form-input:focus { border-color: var(--primary); background: var(--card-bg); }
+        .form-input:focus {
+            border-color: var(--primary);
+            background: var(--card-bg);
+        }
 
-        .tabs { display: flex; gap: 0; margin-bottom: 20px; border-radius: 10px; overflow: hidden; background: var(--card-hover-bg); padding: 3px; }
-        .tab-btn {
-            flex: 1; padding: 10px; border: none; cursor: pointer; font-weight: 600;
-            background: transparent; transition: var(--transition); font-size: 0.9rem;
-            border-radius: 8px; color: var(--text-light);
+        .tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            background: var(--card-hover-bg);
+            padding: 3px;
         }
-        .tab-btn.active { background: var(--card-bg); color: var(--primary); box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
-        .alert { padding: 10px 14px; border-radius: 10px; margin-bottom: 14px; font-size: 0.85rem; display: none; }
-        .alert-error { background: var(--alert-error-bg); color: var(--alert-error-text); display: block; }
-        .alert-success { background: var(--alert-success-bg); color: var(--alert-success-text); display: block; }
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            background: transparent;
+            transition: var(--transition);
+            font-size: 0.9rem;
+            border-radius: 8px;
+            color: var(--text-light);
+        }
+        .tab-btn.active {
+            background: var(--card-bg);
+            color: var(--primary);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+        }
+        .alert {
+            padding: 10px 14px;
+            border-radius: 10px;
+            margin-bottom: 14px;
+            font-size: 0.85rem;
+            display: none;
+        }
+        .alert-error {
+            background: var(--alert-error-bg);
+            color: var(--alert-error-text);
+            display: block;
+        }
+        .alert-success {
+            background: var(--alert-success-bg);
+            color: var(--alert-success-text);
+            display: block;
+        }
 
         .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--modal-overlay); backdrop-filter: blur(2px);
-            z-index: 1000; display: flex; align-items: center; justify-content: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--modal-overlay);
+            backdrop-filter: blur(2px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .modal {
-            background: var(--card-bg); border-radius: var(--radius); padding: 24px;
-            max-width: 480px; width: 90%; box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 24px;
+            max-width: 480px;
+            width: 90%;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
             color: var(--text);
+            max-height: 85vh;
+            overflow-y: auto;
         }
-        .modal h3 { margin-bottom: 16px; font-weight: 700; }
-        .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+        .modal h3 {
+            margin-bottom: 16px;
+            font-weight: 700;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
 
         .toast {
-            position: fixed; bottom: 24px; right: 24px; background: #1a1a2e; color: #fff;
-            padding: 12px 20px; border-radius: 30px; font-size: 0.85rem; font-weight: 500;
-            z-index: 2000; box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #1a1a2e;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            z-index: 2000;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .section-divider {
+            border-top: 2px dashed var(--border);
+            margin: 16px 0;
+            padding-top: 8px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-light);
+            font-weight: 700;
         }
 
         @media (max-width: 850px) {
-            body { padding: 12px; }
-            main { flex-direction: column; }
-            .sidebar { width: 100%; position: static; }
-            .items-grid { grid-template-columns: 1fr; }
-            header { flex-direction: column; align-items: flex-start; }
+            body {
+                padding: 12px;
+            }
+            main {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                position: static;
+                max-height: none;
+            }
+            .items-grid {
+                grid-template-columns: 1fr;
+            }
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
     </style>
 </head>
 <body>
-<div class="container">
-    <header>
-        <div class="logo"><span>🌲</span> Походный чек-лист тихоходок</div>
-        <div class="header-right" id="headerRight">
-            <span class="sync-badge hidden" id="syncBadge">💾 Локально</span>
-            <span id="headerUserInfo" style="font-weight:600;"></span>
-            <button class="btn btn-sm btn-outline" id="themeToggle" title="Тёмная/светлая тема">🌓</button>
-            <button class="btn btn-sm btn-outline hidden" id="collapseAllBtn">📁 Свернуть всё</button>
-            <button class="btn btn-sm btn-outline hidden" id="expandAllBtn">📂 Развернуть всё</button>
-            <button class="btn btn-sm btn-outline hidden" id="resetChecksBtn">🔄 Сбросить отметки</button>
-            <button class="btn btn-sm btn-outline hidden" id="exportBtn">📤 Экспорт</button>
-            <button class="btn btn-sm btn-outline hidden" id="importBtn">📥 Импорт</button>
-            <button class="btn btn-sm btn-outline hidden" id="createSharedBtn">👥 Совместный поход</button>
-            <button class="btn btn-sm btn-ghost hidden" id="logoutBtn" style="color:var(--danger);">🚪 Выйти</button>
-        </div>
-    </header>
-
-    <main id="mainContent" class="hidden">
-        <aside class="sidebar">
-            <div class="user-card" style="text-align:center; margin-bottom:16px; border-bottom:1px solid var(--border); padding-bottom:16px;">
-                <div class="avatar" id="userAvatar" style="width:64px; height:64px; border-radius:20px; background:linear-gradient(135deg,#4f7cff,#7b9cff); color:#fff; display:flex; align-items:center; justify-content:center; font-size:2rem; margin:0 auto 10px;">?</div>
-                <div class="user-name" id="usernameDisplay" style="font-weight:700;">Гость</div>
-                <div class="user-email" id="userEmailDisplay" style="font-size:0.8rem; color:var(--text-light);"></div>
-                <button class="switch-user-btn" id="switchUserBtn" style="background:none; border:none; color:var(--primary); cursor:pointer; margin-top:6px;">↻ Сменить аккаунт</button>
+    <div class="container">
+        <header>
+            <div class="logo"><span>🌲</span> Походный чек-лист тихоходок</div>
+            <div class="header-right" id="headerRight">
+                <span class="sync-badge hidden" id="syncBadge">💾 Локально</span>
+                <span class="shared-indicator hidden" id="sharedIndicator">👥 Совместно</span>
+                <span id="headerUserInfo" style="font-weight:600;"></span>
+                <button class="btn btn-sm btn-outline" id="themeToggle" title="Тёмная/светлая тема">🌓</button>
+                <button class="btn btn-sm btn-outline hidden" id="collapseAllBtn">📁 Свернуть всё</button>
+                <button class="btn btn-sm btn-outline hidden" id="expandAllBtn">📂 Развернуть всё</button>
+                <button class="btn btn-sm btn-outline hidden" id="resetChecksBtn">🔄 Сбросить отметки</button>
+                <button class="btn btn-sm btn-outline hidden" id="exportBtn">📤 Экспорт</button>
+                <button class="btn btn-sm btn-outline hidden" id="importBtn">📥 Импорт</button>
+                <button class="btn btn-sm btn-outline hidden" id="createSharedBtn">👥 Совместный поход</button>
+                <button class="btn btn-sm btn-ghost hidden" id="logoutBtn" style="color:var(--danger);">🚪 Выйти</button>
             </div>
+        </header>
 
-            <div style="margin-bottom:12px;">
-                <label class="form-label">🏕️ Активный список</label>
-                <div class="checklist-tabs" id="checklistTabs"></div>
-                <div style="display:flex; gap:6px; margin-top:6px;">
-                    <button class="btn btn-sm btn-ghost" id="addChecklistBtn">➕ Новый</button>
-                    <button class="btn btn-sm btn-ghost" id="copyChecklistBtn">📋 Копия</button>
-                    <button class="btn btn-sm btn-ghost" id="renameChecklistBtn">✏️ Имя</button>
-                    <button class="btn btn-sm btn-ghost" id="deleteChecklistBtn" style="color:var(--danger);">🗑️</button>
+        <main id="mainContent" class="hidden">
+            <aside class="sidebar">
+                <div class="user-card" style="text-align:center; margin-bottom:16px; border-bottom:1px solid var(--border); padding-bottom:16px;">
+                    <div class="avatar" id="userAvatar" style="width:64px; height:64px; border-radius:20px; background:linear-gradient(135deg,#4f7cff,#7b9cff); color:#fff; display:flex; align-items:center; justify-content:center; font-size:2rem; margin:0 auto 10px;">?</div>
+                    <div class="user-name" id="usernameDisplay" style="font-weight:700;">Гость</div>
+                    <div class="user-email" id="userEmailDisplay" style="font-size:0.8rem; color:var(--text-light);"></div>
+                    <button class="switch-user-btn" id="switchUserBtn" style="background:none; border:none; color:var(--primary); cursor:pointer; margin-top:6px;">↻ Сменить аккаунт</button>
                 </div>
-            </div>
 
-            <div class="trip-date-section">
-                <label class="form-label">📅 Дата похода</label>
-                <input type="date" class="form-input" id="tripDateInput">
-                <div class="countdown" id="countdownDisplay"></div>
-            </div>
-
-            <div class="progress-section">
-                <h4>📊 Общий прогресс</h4>
-                <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-                <div class="stats">
-                    <div class="stat-card"><div class="stat-value" id="selectedCount">0</div><div class="stat-label">Выбрано</div></div>
-                    <div class="stat-card"><div class="stat-value" id="totalCount">0</div><div class="stat-label">Всего</div></div>
+                <div style="margin-bottom:12px;">
+                    <label class="form-label">🏕️ Мои списки</label>
+                    <div class="checklist-tabs" id="checklistTabs"></div>
+                    <div style="display:flex; gap:6px; margin-top:6px; flex-wrap:wrap;">
+                        <button class="btn btn-sm btn-ghost" id="addChecklistBtn">➕ Новый</button>
+                        <button class="btn btn-sm btn-ghost" id="copyChecklistBtn">📋 Копия</button>
+                        <button class="btn btn-sm btn-ghost" id="renameChecklistBtn">✏️ Имя</button>
+                        <button class="btn btn-sm btn-ghost" id="deleteChecklistBtn" style="color:var(--danger);">🗑️</button>
+                    </div>
                 </div>
-                <div style="margin-top:12px; font-weight:600;">⚖️ Общий вес: <span id="totalWeight">0</span> г</div>
-            </div>
 
-            <!-- Блок совместной сессии -->
-            <div class="shared-session-box hidden" id="sharedSessionBox">
-                <h4 style="margin-bottom:8px;">👥 Совместный поход</h4>
-                <div id="sharedParticipants"></div>
-                <div style="margin-top:10px; display:flex; gap:6px; flex-wrap:wrap;">
-                    <button class="btn btn-sm btn-outline" id="copySharedLinkBtn">🔗 Копировать ссылку</button>
-                    <button class="btn btn-sm btn-ghost" id="leaveSharedBtn">🚪 Выйти</button>
+                <div id="sharedChecklistsSection" class="hidden">
+                    <div class="section-divider">👥 Совместные походы</div>
+                    <div class="checklist-tabs" id="sharedChecklistTabs"></div>
+                    <button class="btn btn-sm btn-ghost" id="refreshSharedBtn" style="margin-top:4px;">🔄 Обновить</button>
                 </div>
-            </div>
-        </aside>
 
-        <div class="content">
-            <div class="search-filter-bar">
-                <input type="text" class="search-input" id="searchInput" placeholder="🔍 Поиск по названию...">
-                <select class="filter-select" id="filterSelect">
-                    <option value="all">Все предметы</option>
-                    <option value="required">Обязательные</option>
-                    <option value="optional">Необязательные</option>
-                    <option value="checked">Отмеченные</option>
-                    <option value="unchecked">Неотмеченные</option>
-                </select>
-            </div>
-            <div id="checklistContent"></div>
-            <button class="add-category-btn" id="addCategoryBtn">➕ Добавить свою категорию</button>
-        </div>
-    </main>
+                <div class="trip-date-section">
+                    <label class="form-label">📅 Дата похода</label>
+                    <input type="date" class="form-input" id="tripDateInput">
+                    <div class="countdown" id="countdownDisplay"></div>
+                </div>
 
-    <div id="loginContainer" class="login-container">
-        <h2 class="login-title">🌲 Добро пожаловать</h2>
-        <div class="tabs">
-            <button class="tab-btn active" data-tab="login">Вход</button>
-            <button class="tab-btn" data-tab="register">Регистрация</button>
-            <button class="tab-btn" data-tab="join">Совместный поход</button>
+                <div class="progress-section">
+                    <h4>📊 Общий прогресс</h4>
+                    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+                    <div class="stats">
+                        <div class="stat-card"><div class="stat-value" id="selectedCount">0</div><div class="stat-label">Выбрано</div></div>
+                        <div class="stat-card"><div class="stat-value" id="totalCount">0</div><div class="stat-label">Всего</div></div>
+                    </div>
+                    <div style="margin-top:12px; font-weight:600;">⚖️ Общий вес: <span id="totalWeight">0</span> г</div>
+                </div>
+
+                <div class="shared-session-box hidden" id="sharedSessionBox">
+                    <h4 style="margin-bottom:8px;">👥 Участники</h4>
+                    <div id="sharedParticipants"></div>
+                    <div style="margin-top:10px; display:flex; gap:6px; flex-wrap:wrap;">
+                        <button class="btn btn-sm btn-outline" id="copySharedLinkBtn">🔗 Копировать ссылку</button>
+                        <button class="btn btn-sm btn-outline hidden" id="manageSharedBtn" style="color:var(--primary);">⚙️ Управление</button>
+                        <button class="btn btn-sm btn-ghost" id="leaveSharedBtn">🚪 Выйти</button>
+                    </div>
+                </div>
+            </aside>
+
+            <div class="content">
+                <div class="search-filter-bar">
+                    <input type="text" class="search-input" id="searchInput" placeholder="🔍 Поиск по названию...">
+                    <select class="filter-select" id="filterSelect">
+                        <option value="all">Все предметы</option>
+                        <option value="required">Обязательные</option>
+                        <option value="optional">Необязательные</option>
+                        <option value="checked">Отмеченные</option>
+                        <option value="unchecked">Неотмеченные</option>
+                    </select>
+                </div>
+                <div id="checklistContent"></div>
+                <button class="add-category-btn hidden" id="addCategoryBtn">➕ Добавить свою категорию</button>
+            </div>
+        </main>
+
+        <div id="loginContainer" class="login-container">
+            <h2 class="login-title">🌲 Добро пожаловать</h2>
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="login">Вход</button>
+                <button class="tab-btn" data-tab="register">Регистрация</button>
+                <button class="tab-btn" data-tab="join">Совместный поход</button>
+            </div>
+            <div id="alertBox" class="alert"></div>
+            <div id="tabLogin">
+                <div class="form-group"><label class="form-label">Логин</label><input type="text" class="form-input" id="loginUsername" placeholder="Ваш логин" autocomplete="username"></div>
+                <div class="form-group"><label class="form-label">Пароль</label><input type="password" class="form-input" id="loginPassword" placeholder="Пароль" autocomplete="current-password"></div>
+                <button class="btn btn-primary" id="loginBtn" style="width:100%;">🔑 Войти</button>
+            </div>
+            <div id="tabRegister" class="hidden">
+                <div class="form-group"><label class="form-label">Придумайте логин</label><input type="text" class="form-input" id="regUsername" placeholder="Минимум 3 символа"></div>
+                <div class="form-group"><label class="form-label">Пароль</label><input type="password" class="form-input" id="regPassword" placeholder="Минимум 4 символа"></div>
+                <div class="form-group"><label class="form-label">Повторите пароль</label><input type="password" class="form-input" id="regPassword2" placeholder="Повторите пароль"></div>
+                <button class="btn btn-accent" id="registerBtn" style="width:100%;">✨ Зарегистрироваться</button>
+            </div>
+            <div id="tabJoin" class="hidden">
+                <p style="margin-bottom:12px; color:var(--text-light);">Присоединяйтесь к существующему совместному походу.</p>
+                <div class="form-group"><label class="form-label">ID сессии (из ссылки)</label><input type="text" class="form-input" id="joinSessionId" placeholder="Например: session_abc123"></div>
+                <div class="form-group"><label class="form-label">Ваше имя</label><input type="text" class="form-input" id="joinUserName" placeholder="Как вас зовут"></div>
+                <button class="btn btn-accent" id="joinSessionBtn" style="width:100%;">👥 Присоединиться</button>
+            </div>
         </div>
-        <div id="alertBox" class="alert"></div>
-        <div id="tabLogin">
-            <div class="form-group"><label class="form-label">Логин</label><input type="text" class="form-input" id="loginUsername" placeholder="Ваш логин" autocomplete="username"></div>
-            <div class="form-group"><label class="form-label">Пароль</label><input type="password" class="form-input" id="loginPassword" placeholder="Пароль" autocomplete="current-password"></div>
-            <button class="btn btn-primary" id="loginBtn" style="width:100%;">🔑 Войти</button>
-        </div>
-        <div id="tabRegister" class="hidden">
-            <div class="form-group"><label class="form-label">Придумайте логин</label><input type="text" class="form-input" id="regUsername" placeholder="Минимум 3 символа"></div>
-            <div class="form-group"><label class="form-label">Пароль</label><input type="password" class="form-input" id="regPassword" placeholder="Минимум 4 символа"></div>
-            <div class="form-group"><label class="form-label">Повторите пароль</label><input type="password" class="form-input" id="regPassword2" placeholder="Повторите пароль"></div>
-            <button class="btn btn-accent" id="registerBtn" style="width:100%;">✨ Зарегистрироваться</button>
-        </div>
-        <div id="tabJoin" class="hidden">
-            <p style="margin-bottom:12px; color:var(--text-light);">Присоединяйтесь к существующему совместному походу.</p>
-            <div class="form-group"><label class="form-label">ID сессии (из ссылки)</label><input type="text" class="form-input" id="joinSessionId" placeholder="Например: session_abc123"></div>
-            <div class="form-group"><label class="form-label">Ваше имя</label><input type="text" class="form-input" id="joinUserName" placeholder="Как вас зовут"></div>
-            <button class="btn btn-accent" id="joinSessionBtn" style="width:100%;">👥 Присоединиться</button>
-        </div>
+
+        <div id="modalContainer"></div>
+        <div id="toastContainer"></div>
+        <input type="file" id="importFileInput" accept=".json" style="display:none;">
     </div>
 
-    <div id="modalContainer"></div>
-    <div id="toastContainer"></div>
-    <input type="file" id="importFileInput" accept=".json" style="display:none;">
-</div>
-
-<script>
-    (function() {
-        const firebaseConfig = {
-            apiKey: "AIzaSyDAgI0mqUVdKTO1LHwaAtbfiX38sy1oWCM",
-            authDomain: "hike-380f6.firebaseapp.com",
-            projectId: "hike-380f6",
-            storageBucket: "hike-380f6.firebasestorage.app",
-            messagingSenderId: "229797369492",
-            appId: "1:229797369492:web:2a427a24137d7e5e4cc681",
-            measurementId: "G-6SGLEME6DX"
-        };
-
-        const defaultChecklistData = [
-            { id: "cat-basic", category: "🎒 Основное", isDefault: true, items: [
-                { id: "backpack", text: "Рюкзак от 75 л, накидка от дождя", required: true, weight: 0 },
-                { id: "sleepingbag", text: "Спальник на комфорт от +5°C", required: true, weight: 0 },
-                { id: "mat", text: "Пенка-коврик", required: true, weight: 0 },
-                { id: "kit", text: "КЛМН", required: true, weight: 0 },
-                { id: "seat", text: "Поджопник", required: true, weight: 0 },
-                { id: "pillow", text: "Подушка надувная", optional: true, weight: 0 },
-                { id: "drybags", text: "Гермомешки", required: true, weight: 0 }
-            ]},
-            { id: "cat-docs", category: "📋 Документы", isDefault: true, items: [
-                { id: "tickets", text: "Билеты", required: true, weight: 0 },
-                { id: "passport", text: "Паспорт", required: true, weight: 0 },
-                { id: "insurance", text: "Полис", required: true, weight: 0 },
-                { id: "license", text: "Права", optional: true, weight: 0 },
-                { id: "cash", text: "Наличные", required: true, weight: 0 }
-            ]},
-            { id: "cat-hygiene", category: "🧴 Гигиена", isDefault: true, items: [
-                { id: "cream", text: "Крем увлажняющий", required: true, weight: 0 },
-                { id: "lipbalm", text: "Гигиеническая помада", required: true, weight: 0 },
-                { id: "toiletries", text: "Мыло, щётка, паста", required: true, weight: 0 },
-                { id: "handkerchief", text: "Платок носовой", required: true, weight: 0 },
-                { id: "toiletpaper", text: "Туалетная бумага", required: true, weight: 0 },
-                { id: "wipes", text: "Влажные салфетки", required: true, weight: 0 },
-                { id: "towel", text: "Полотенце", required: true, weight: 0 },
-                { id: "razor", text: "Бритва", optional: true, weight: 0 },
-                { id: "repellent", text: "Репеллент, SPF", required: true, weight: 0 }
-            ]},
-            { id: "cat-gear", category: "🔦 Снаряжение", isDefault: true, items: [
-                { id: "thermos", text: "Термос", required: true, weight: 0 },
-                { id: "poles", text: "Треккинговые палки", required: true, weight: 0 },
-                { id: "bottle", text: "Бутылка для воды", required: true, weight: 0 },
-                { id: "phone", text: "Телефон+зарядка", required: true, weight: 0 },
-                { id: "powerbank", text: "Пауэрбанк", required: true, weight: 0 },
-                { id: "sunglasses", text: "Очки солнцезащитные", optional: true, weight: 0 },
-                { id: "headlamp", text: "Налобный фонарик", required: true, weight: 0 },
-                { id: "whistle", text: "Свисток", required: true, weight: 0 },
-                { id: "earplugs", text: "Беруши", optional: true, weight: 0 },
-                { id: "lighter", text: "Зажигалка", required: true, weight: 0 },
-                { id: "daypack", text: "Штурмовой рюкзак", optional: true, weight: 0 },
-                { id: "firstaid", text: "Личная аптечка", required: true, weight: 0 }
-            ]},
-            { id: "cat-clothes", category: "👕 Одежда", isDefault: true, items: [
-                { id: "shorts", text: "Шорты", optional: true, weight: 0 },
-                { id: "thermounderwear", text: "Термобельё", required: true, weight: 0 },
-                { id: "tshirt", text: "Футболка синт.", required: true, weight: 0 },
-                { id: "hat", text: "Головной убор", required: true, weight: 0 },
-                { id: "nighthat", text: "Шапка для сна", optional: true, weight: 0 },
-                { id: "fleece", text: "Флиска", required: true, weight: 0 },
-                { id: "windbreaker", text: "Ветровка", required: true, weight: 0 },
-                { id: "raincoat", text: "Дождевик", required: true, weight: 0 },
-                { id: "pants", text: "Штаны непром.", required: true, weight: 0 },
-                { id: "hikingpants", text: "Ходовые штаны", required: true, weight: 0 },
-                { id: "gaiters", text: "Гамаши", optional: true, weight: 0 },
-                { id: "boots", text: "Ботинки трек.", required: true, weight: 0 },
-                { id: "sandals", text: "Сланцы", required: true, weight: 0 },
-                { id: "extrashoes", text: "Запасная обувь", required: true, weight: 0 },
-                { id: "gloves", text: "Перчатки флис.", optional: true, weight: 0 },
-                { id: "workgloves", text: "Перчатки рабочие", required: true, weight: 0 },
-                { id: "socks", text: "Носки трек.", required: true, weight: 0 },
-                { id: "nightsocks", text: "Носки для сна", required: true, weight: 0 },
-                { id: "underwear", text: "Нижнее бельё", required: true, weight: 0 },
-                { id: "swimwear", text: "Купальник", optional: true, weight: 0 }
-            ]},
-            { id: "cat-team", category: "⛺ Командное", isDefault: true, items: [
-                { id: "food", text: "Еда", required: true, weight: 0 },
-                { id: "tents", text: "Палатки", required: true, weight: 0 },
-                { id: "cookware", text: "Котелки", required: true, weight: 0 },
-                { id: "saw", text: "Пила", required: true, weight: 0 },
-                { id: "tarp", text: "Тент", required: true, weight: 0 },
-                { id: "specialgear", text: "Спецснаряжение", required: true, weight: 0 },
-                { id: "teamfirstaid", text: "Командная аптечка", required: true, weight: 0 },
-                { id: "repairkit", text: "Ремнабор", required: true, weight: 0 },
-                { id: "firetools", text: "Костровые принадл.", required: true, weight: 0 },
-                { id: "firestarter", text: "Розжиг", required: true, weight: 0 },
-                { id: "stove", text: "Печка", optional: true, weight: 0 },
-                { id: "rope", text: "Верёвка", required: true, weight: 0 },
-                { id: "burner", text: "Горелка", required: true, weight: 0 },
-                { id: "windscreen", text: "Ветрозащита", required: true, weight: 0 },
-                { id: "gascanisters", text: "Газовые баллоны", required: true, weight: 0 },
-                { id: "collapsiblebottle", text: "Бутылка складная", required: true, weight: 0 },
-                { id: "notebook", text: "Блокнот+ручка", optional: true, weight: 0 },
-                { id: "matches", text: "Спички", required: true, weight: 0 },
-                { id: "tape", text: "Скотч армированный", required: true, weight: 0 },
-                { id: "trashbags", text: "Мусорные пакеты", required: true, weight: 0 },
-                { id: "smallbags", text: "Пакеты для сухпая", required: true, weight: 0 }
-            ]}
-        ];
-
-        let appState = {
-            currentUser: null,
-            checklists: [],
-            currentChecklistId: null,
-            firebaseAvailable: false,
-            db: null,
-            syncStatus: 'local',
-            theme: 'light',
-            sharedSessionId: null,
-            sharedSessionUnsubscribe: null,
-            sharedSessionData: null,  // документ Firestore
-        };
-
-        const $ = (sel) => document.querySelector(sel);
-        const dom = {
-            headerRight: $('#headerRight'),
-            themeToggle: $('#themeToggle'),
-            collapseAllBtn: $('#collapseAllBtn'),
-            expandAllBtn: $('#expandAllBtn'),
-            resetChecksBtn: $('#resetChecksBtn'),
-            exportBtn: $('#exportBtn'),
-            importBtn: $('#importBtn'),
-            createSharedBtn: $('#createSharedBtn'),
-            syncBadge: $('#syncBadge'),
-            headerUserInfo: $('#headerUserInfo'),
-            logoutBtn: $('#logoutBtn'),
-            mainContent: $('#mainContent'),
-            loginContainer: $('#loginContainer'),
-            alertBox: $('#alertBox'),
-            tabLogin: $('#tabLogin'),
-            tabRegister: $('#tabRegister'),
-            tabJoin: $('#tabJoin'),
-            loginUsername: $('#loginUsername'),
-            loginPassword: $('#loginPassword'),
-            loginBtn: $('#loginBtn'),
-            regUsername: $('#regUsername'),
-            regPassword: $('#regPassword'),
-            regPassword2: $('#regPassword2'),
-            registerBtn: $('#registerBtn'),
-            joinSessionId: $('#joinSessionId'),
-            joinUserName: $('#joinUserName'),
-            joinSessionBtn: $('#joinSessionBtn'),
-            userAvatar: $('#userAvatar'),
-            usernameDisplay: $('#usernameDisplay'),
-            userEmailDisplay: $('#userEmailDisplay'),
-            switchUserBtn: $('#switchUserBtn'),
-            checklistTabs: $('#checklistTabs'),
-            addChecklistBtn: $('#addChecklistBtn'),
-            copyChecklistBtn: $('#copyChecklistBtn'),
-            renameChecklistBtn: $('#renameChecklistBtn'),
-            deleteChecklistBtn: $('#deleteChecklistBtn'),
-            tripDateInput: $('#tripDateInput'),
-            countdownDisplay: $('#countdownDisplay'),
-            progressFill: $('#progressFill'),
-            selectedCount: $('#selectedCount'),
-            totalCount: $('#totalCount'),
-            totalWeight: $('#totalWeight'),
-            searchInput: $('#searchInput'),
-            filterSelect: $('#filterSelect'),
-            checklistContent: $('#checklistContent'),
-            addCategoryBtn: $('#addCategoryBtn'),
-            modalContainer: $('#modalContainer'),
-            toastContainer: $('#toastContainer'),
-            importFileInput: $('#importFileInput'),
-            sharedSessionBox: $('#sharedSessionBox'),
-            sharedParticipants: $('#sharedParticipants'),
-            copySharedLinkBtn: $('#copySharedLinkBtn'),
-            leaveSharedBtn: $('#leaveSharedBtn'),
-        };
-
-        const hashPassword = (pwd) => CryptoJS.SHA256(pwd + 'hiking_salt_2025').toString();
-        function escapeHTML(str) { const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
-        function showToast(msg) {
-            const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
-            dom.toastContainer.appendChild(t); setTimeout(() => t.remove(), 2600);
-        }
-        function showAlert(msg, type) {
-            dom.alertBox.textContent = msg; dom.alertBox.className = 'alert alert-' + type; dom.alertBox.style.display = 'block';
-            setTimeout(() => { dom.alertBox.style.display = 'none'; dom.alertBox.className = 'alert'; }, 4000);
-        }
-
-        function openModal(title, contentHTML, onSave) {
-            const overlay = document.createElement('div'); overlay.className = 'modal-overlay';
-            overlay.innerHTML = `<div class="modal"><h3>${title}</h3><div>${contentHTML}</div><div class="modal-actions"><button class="btn btn-ghost" data-action="cancel">Отмена</button><button class="btn btn-primary" data-action="save">Сохранить</button></div></div>`;
-            document.body.appendChild(overlay);
-            const close = () => overlay.remove();
-            overlay.querySelector('[data-action="cancel"]').addEventListener('click', close);
-            overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
-            overlay.querySelector('[data-action="save"]').addEventListener('click', () => {
-                const result = onSave(overlay.querySelector('.modal'));
-                if (result !== false) close();
-            });
-        }
-
-        function confirmDelete(msg, onConfirm) {
-            const overlay = document.createElement('div'); overlay.className = 'modal-overlay';
-            overlay.innerHTML = `<div class="modal"><h3>⚠️ Подтверждение</h3><p>${msg}</p><div class="modal-actions"><button class="btn btn-ghost" data-action="cancel">Отмена</button><button class="btn btn-danger" data-action="confirm">Удалить</button></div></div>`;
-            document.body.appendChild(overlay);
-            const close = () => overlay.remove();
-            overlay.querySelector('[data-action="cancel"]').addEventListener('click', close);
-            overlay.querySelector('[data-action="confirm"]').addEventListener('click', () => { close(); onConfirm(); });
-        }
-
-        function getCurrentChecklist() {
-            return appState.checklists.find(c => c.id === appState.currentChecklistId);
-        }
-
-        function createNewChecklist(name) {
-            const id = 'cl_' + Date.now();
-            const newCL = {
-                id, name, tripDate: '',
-                checklistData: JSON.parse(JSON.stringify(defaultChecklistData)),
-                selectedItems: {},
-                collapsedCategories: {},
-                userCategories: []
+    <script>
+        (function() {
+            const firebaseConfig = {
+                apiKey: "AIzaSyDAgI0mqUVdKTO1LHwaAtbfiX38sy1oWCM",
+                authDomain: "hike-380f6.firebaseapp.com",
+                projectId: "hike-380f6",
+                storageBucket: "hike-380f6.firebasestorage.app",
+                messagingSenderId: "229797369492",
+                appId: "1:229797369492:web:2a427a24137d7e5e4cc681",
+                measurementId: "G-6SGLEME6DX"
             };
-            appState.checklists.push(newCL);
-            appState.currentChecklistId = id;
-            persistData();
-            renderAll();
-        }
 
-        function duplicateChecklist() {
-            const current = getCurrentChecklist();
-            if (!current) return;
-            const id = 'cl_' + Date.now();
-            const copy = JSON.parse(JSON.stringify(current));
-            copy.id = id;
-            copy.name = current.name + ' (копия)';
-            appState.checklists.push(copy);
-            appState.currentChecklistId = id;
-            persistData();
-            renderAll();
-        }
+            const defaultChecklistData = [
+                { id: "cat-basic", category: "🎒 Основное", isDefault: true, items: [
+                        { id: "backpack", text: "Рюкзак от 75 л, накидка от дождя", required: true, weight: 0 },
+                        { id: "sleepingbag", text: "Спальник на комфорт от +5°C", required: true, weight: 0 },
+                        { id: "mat", text: "Пенка-коврик", required: true, weight: 0 },
+                        { id: "kit", text: "КЛМН", required: true, weight: 0 },
+                        { id: "seat", text: "Поджопник", required: true, weight: 0 },
+                        { id: "pillow", text: "Подушка надувная", optional: true, weight: 0 },
+                        { id: "drybags", text: "Гермомешки", required: true, weight: 0 }
+                    ] },
+                { id: "cat-docs", category: "📋 Документы", isDefault: true, items: [
+                        { id: "tickets", text: "Билеты", required: true, weight: 0 },
+                        { id: "passport", text: "Паспорт", required: true, weight: 0 },
+                        { id: "insurance", text: "Полис", required: true, weight: 0 },
+                        { id: "license", text: "Права", optional: true, weight: 0 },
+                        { id: "cash", text: "Наличные", required: true, weight: 0 }
+                    ] },
+                { id: "cat-hygiene", category: "🧴 Гигиена", isDefault: true, items: [
+                        { id: "cream", text: "Крем увлажняющий", required: true, weight: 0 },
+                        { id: "lipbalm", text: "Гигиеническая помада", required: true, weight: 0 },
+                        { id: "toiletries", text: "Мыло, щётка, паста", required: true, weight: 0 },
+                        { id: "handkerchief", text: "Платок носовой", required: true, weight: 0 },
+                        { id: "toiletpaper", text: "Туалетная бумага", required: true, weight: 0 },
+                        { id: "wipes", text: "Влажные салфетки", required: true, weight: 0 },
+                        { id: "towel", text: "Полотенце", required: true, weight: 0 },
+                        { id: "razor", text: "Бритва", optional: true, weight: 0 },
+                        { id: "repellent", text: "Репеллент, SPF", required: true, weight: 0 }
+                    ] },
+                { id: "cat-gear", category: "🔦 Снаряжение", isDefault: true, items: [
+                        { id: "thermos", text: "Термос", required: true, weight: 0 },
+                        { id: "poles", text: "Треккинговые палки", required: true, weight: 0 },
+                        { id: "bottle", text: "Бутылка для воды", required: true, weight: 0 },
+                        { id: "phone", text: "Телефон+зарядка", required: true, weight: 0 },
+                        { id: "powerbank", text: "Пауэрбанк", required: true, weight: 0 },
+                        { id: "sunglasses", text: "Очки солнцезащитные", optional: true, weight: 0 },
+                        { id: "headlamp", text: "Налобный фонарик", required: true, weight: 0 },
+                        { id: "whistle", text: "Свисток", required: true, weight: 0 },
+                        { id: "earplugs", text: "Беруши", optional: true, weight: 0 },
+                        { id: "lighter", text: "Зажигалка", required: true, weight: 0 },
+                        { id: "daypack", text: "Штурмовой рюкзак", optional: true, weight: 0 },
+                        { id: "firstaid", text: "Личная аптечка", required: true, weight: 0 }
+                    ] },
+                { id: "cat-clothes", category: "👕 Одежда", isDefault: true, items: [
+                        { id: "shorts", text: "Шорты", optional: true, weight: 0 },
+                        { id: "thermounderwear", text: "Термобельё", required: true, weight: 0 },
+                        { id: "tshirt", text: "Футболка синт.", required: true, weight: 0 },
+                        { id: "hat", text: "Головной убор", required: true, weight: 0 },
+                        { id: "nighthat", text: "Шапка для сна", optional: true, weight: 0 },
+                        { id: "fleece", text: "Флиска", required: true, weight: 0 },
+                        { id: "windbreaker", text: "Ветровка", required: true, weight: 0 },
+                        { id: "raincoat", text: "Дождевик", required: true, weight: 0 },
+                        { id: "pants", text: "Штаны непром.", required: true, weight: 0 },
+                        { id: "hikingpants", text: "Ходовые штаны", required: true, weight: 0 },
+                        { id: "gaiters", text: "Гамаши", optional: true, weight: 0 },
+                        { id: "boots", text: "Ботинки трек.", required: true, weight: 0 },
+                        { id: "sandals", text: "Сланцы", required: true, weight: 0 },
+                        { id: "extrashoes", text: "Запасная обувь", required: true, weight: 0 },
+                        { id: "gloves", text: "Перчатки флис.", optional: true, weight: 0 },
+                        { id: "workgloves", text: "Перчатки рабочие", required: true, weight: 0 },
+                        { id: "socks", text: "Носки трек.", required: true, weight: 0 },
+                        { id: "nightsocks", text: "Носки для сна", required: true, weight: 0 },
+                        { id: "underwear", text: "Нижнее бельё", required: true, weight: 0 },
+                        { id: "swimwear", text: "Купальник", optional: true, weight: 0 }
+                    ] },
+                { id: "cat-team", category: "⛺ Командное", isDefault: true, items: [
+                        { id: "food", text: "Еда", required: true, weight: 0 },
+                        { id: "tents", text: "Палатки", required: true, weight: 0 },
+                        { id: "cookware", text: "Котелки", required: true, weight: 0 },
+                        { id: "saw", text: "Пила", required: true, weight: 0 },
+                        { id: "tarp", text: "Тент", required: true, weight: 0 },
+                        { id: "specialgear", text: "Спецснаряжение", required: true, weight: 0 },
+                        { id: "teamfirstaid", text: "Командная аптечка", required: true, weight: 0 },
+                        { id: "repairkit", text: "Ремнабор", required: true, weight: 0 },
+                        { id: "firetools", text: "Костровые принадл.", required: true, weight: 0 },
+                        { id: "firestarter", text: "Розжиг", required: true, weight: 0 },
+                        { id: "stove", text: "Печка", optional: true, weight: 0 },
+                        { id: "rope", text: "Верёвка", required: true, weight: 0 },
+                        { id: "burner", text: "Горелка", required: true, weight: 0 },
+                        { id: "windscreen", text: "Ветрозащита", required: true, weight: 0 },
+                        { id: "gascanisters", text: "Газовые баллоны", required: true, weight: 0 },
+                        { id: "collapsiblebottle", text: "Бутылка складная", required: true, weight: 0 },
+                        { id: "notebook", text: "Блокнот+ручка", optional: true, weight: 0 },
+                        { id: "matches", text: "Спички", required: true, weight: 0 },
+                        { id: "tape", text: "Скотч армированный", required: true, weight: 0 },
+                        { id: "trashbags", text: "Мусорные пакеты", required: true, weight: 0 },
+                        { id: "smallbags", text: "Пакеты для сухпая", required: true, weight: 0 }
+                    ] }
+            ];
 
-        function renameChecklist(newName) {
-            const cl = getCurrentChecklist();
-            if (cl && newName.trim()) { cl.name = newName.trim(); persistData(); renderChecklistTabs(); }
-        }
+            let appState = {
+                currentUser: null,
+                checklists: [],
+                currentChecklistId: null,
+                firebaseAvailable: false,
+                db: null,
+                syncStatus: 'local',
+                theme: 'light',
+                sharedSessionId: null,
+                sharedSessionUnsubscribe: null,
+                sharedSessionData: null,
+                sharedSessionsMeta: [],
+                isAdminOfCurrentSession: false,
+                isSharedChecklistActive: false,
+            };
 
-        function deleteChecklist() {
-            if (appState.checklists.length <= 1) { showToast('Нельзя удалить последний список'); return; }
-            const cl = getCurrentChecklist();
-            if (!cl) return;
-            confirmDelete(`Удалить список «${cl.name}»?`, () => {
-                appState.checklists = appState.checklists.filter(c => c.id !== cl.id);
-                appState.currentChecklistId = appState.checklists[0]?.id;
+            const $ = (sel) => document.querySelector(sel);
+            const dom = {
+                headerRight: $('#headerRight'),
+                themeToggle: $('#themeToggle'),
+                collapseAllBtn: $('#collapseAllBtn'),
+                expandAllBtn: $('#expandAllBtn'),
+                resetChecksBtn: $('#resetChecksBtn'),
+                exportBtn: $('#exportBtn'),
+                importBtn: $('#importBtn'),
+                createSharedBtn: $('#createSharedBtn'),
+                syncBadge: $('#syncBadge'),
+                sharedIndicator: $('#sharedIndicator'),
+                headerUserInfo: $('#headerUserInfo'),
+                logoutBtn: $('#logoutBtn'),
+                mainContent: $('#mainContent'),
+                loginContainer: $('#loginContainer'),
+                alertBox: $('#alertBox'),
+                tabLogin: $('#tabLogin'),
+                tabRegister: $('#tabRegister'),
+                tabJoin: $('#tabJoin'),
+                loginUsername: $('#loginUsername'),
+                loginPassword: $('#loginPassword'),
+                loginBtn: $('#loginBtn'),
+                regUsername: $('#regUsername'),
+                regPassword: $('#regPassword'),
+                regPassword2: $('#regPassword2'),
+                registerBtn: $('#registerBtn'),
+                joinSessionId: $('#joinSessionId'),
+                joinUserName: $('#joinUserName'),
+                joinSessionBtn: $('#joinSessionBtn'),
+                userAvatar: $('#userAvatar'),
+                usernameDisplay: $('#usernameDisplay'),
+                userEmailDisplay: $('#userEmailDisplay'),
+                switchUserBtn: $('#switchUserBtn'),
+                checklistTabs: $('#checklistTabs'),
+                sharedChecklistTabs: $('#sharedChecklistTabs'),
+                sharedChecklistsSection: $('#sharedChecklistsSection'),
+                refreshSharedBtn: $('#refreshSharedBtn'),
+                addChecklistBtn: $('#addChecklistBtn'),
+                copyChecklistBtn: $('#copyChecklistBtn'),
+                renameChecklistBtn: $('#renameChecklistBtn'),
+                deleteChecklistBtn: $('#deleteChecklistBtn'),
+                tripDateInput: $('#tripDateInput'),
+                countdownDisplay: $('#countdownDisplay'),
+                progressFill: $('#progressFill'),
+                selectedCount: $('#selectedCount'),
+                totalCount: $('#totalCount'),
+                totalWeight: $('#totalWeight'),
+                searchInput: $('#searchInput'),
+                filterSelect: $('#filterSelect'),
+                checklistContent: $('#checklistContent'),
+                addCategoryBtn: $('#addCategoryBtn'),
+                modalContainer: $('#modalContainer'),
+                toastContainer: $('#toastContainer'),
+                importFileInput: $('#importFileInput'),
+                sharedSessionBox: $('#sharedSessionBox'),
+                sharedParticipants: $('#sharedParticipants'),
+                copySharedLinkBtn: $('#copySharedLinkBtn'),
+                manageSharedBtn: $('#manageSharedBtn'),
+                leaveSharedBtn: $('#leaveSharedBtn'),
+            };
+
+            const hashPassword = (pwd) => CryptoJS.SHA256(pwd + 'hiking_salt_2025').toString();
+
+            function escapeHTML(str) { const d = document.createElement('div');
+                d.textContent = str; return d.innerHTML; }
+
+            function showToast(msg) {
+                const t = document.createElement('div');
+                t.className = 'toast';
+                t.textContent = msg;
+                dom.toastContainer.appendChild(t);
+                setTimeout(() => { t.style.opacity = '0';
+                    t.style.transition = 'opacity 0.3s';
+                    setTimeout(() => t.remove(), 300); }, 2600);
+            }
+
+            function showAlert(msg, type) {
+                dom.alertBox.textContent = msg;
+                dom.alertBox.className = 'alert alert-' + type;
+                dom.alertBox.style.display = 'block';
+                setTimeout(() => { dom.alertBox.style.display = 'none';
+                    dom.alertBox.className = 'alert'; }, 4000);
+            }
+
+            function openModal(title, contentHTML, onSave) {
+                const overlay = document.createElement('div');
+                overlay.className = 'modal-overlay';
+                overlay.innerHTML =
+                    `<div class="modal"><h3>${title}</h3><div>${contentHTML}</div><div class="modal-actions"><button class="btn btn-ghost" data-action="cancel">Отмена</button><button class="btn btn-primary" data-action="save">Сохранить</button></div></div>`;
+                document.body.appendChild(overlay);
+                const close = () => overlay.remove();
+                overlay.querySelector('[data-action="cancel"]').addEventListener('click', close);
+                overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+                overlay.querySelector('[data-action="save"]').addEventListener('click', () => {
+                    const result = onSave(overlay.querySelector('.modal'));
+                    if (result !== false) close();
+                });
+                setTimeout(() => {
+                    const input = overlay.querySelector('input');
+                    if (input) input.focus();
+                }, 100);
+            }
+
+            function confirmDelete(msg, onConfirm) {
+                const overlay = document.createElement('div');
+                overlay.className = 'modal-overlay';
+                overlay.innerHTML =
+                    `<div class="modal"><h3>⚠️ Подтверждение</h3><p>${msg}</p><div class="modal-actions"><button class="btn btn-ghost" data-action="cancel">Отмена</button><button class="btn btn-danger" data-action="confirm">Удалить</button></div></div>`;
+                document.body.appendChild(overlay);
+                const close = () => overlay.remove();
+                overlay.querySelector('[data-action="cancel"]').addEventListener('click', close);
+                overlay.querySelector('[data-action="confirm"]').addEventListener('click', () => { close();
+                    onConfirm(); });
+            }
+
+            function getCurrentChecklist() {
+                if (appState.isSharedChecklistActive && appState.sharedSessionData) {
+                    return {
+                        id: 'shared_active',
+                        name: appState.sharedSessionData.name || 'Совместный поход',
+                        tripDate: '',
+                        checklistData: appState.sharedSessionData.checklistData || [],
+                        userCategories: appState.sharedSessionData.userCategories || [],
+                        selectedItems: getMySharedCheckedItems(),
+                        collapsedCategories: {},
+                        isShared: true,
+                    };
+                }
+                return appState.checklists.find(c => c.id === appState.currentChecklistId);
+            }
+
+            function getMySharedCheckedItems() {
+                if (!appState.sharedSessionData || !appState.currentUser) return {};
+                const myName = appState.currentUser.username;
+                const pData = appState.sharedSessionData.participants?.[myName];
+                return pData?.checkedItems || {};
+            }
+
+            function getMySharedRole() {
+                if (!appState.sharedSessionData || !appState.currentUser) return 'participant';
+                const myName = appState.currentUser.username;
+                const pData = appState.sharedSessionData.participants?.[myName];
+                return pData?.role || 'participant';
+            }
+
+            function createNewChecklist(name) {
+                const id = 'cl_' + Date.now();
+                const newCL = {
+                    id,
+                    name,
+                    tripDate: '',
+                    checklistData: JSON.parse(JSON.stringify(defaultChecklistData)),
+                    selectedItems: {},
+                    collapsedCategories: {},
+                    userCategories: []
+                };
+                appState.checklists.push(newCL);
+                appState.currentChecklistId = id;
+                appState.isSharedChecklistActive = false;
+                appState.sharedSessionId = null;
                 persistData();
                 renderAll();
-            });
-        }
-
-        function switchChecklist(id) {
-            appState.currentChecklistId = id;
-            persistData();
-            renderAll();
-        }
-
-        function saveToLocalStorage() {
-            const data = {
-                currentUsername: appState.currentUser?.username,
-                passwordHash: appState.currentUser?.passwordHash,
-                checklists: appState.checklists,
-                currentChecklistId: appState.currentChecklistId,
-                theme: appState.theme,
-            };
-            localStorage.setItem('hikingChecklistPro', JSON.stringify(data));
-        }
-
-        function loadFromLocalStorage() {
-            const raw = localStorage.getItem('hikingChecklistPro');
-            if (raw) {
-                try { return JSON.parse(raw); } catch(e){}
             }
-            return null;
-        }
 
-        async function saveUserDataToCloud(username, passwordHash) {
-            if (!appState.firebaseAvailable || !appState.db) return;
-            try {
-                await appState.db.collection('users').doc('user_' + username.toLowerCase()).set({
-                    username, passwordHash,
+            function duplicateChecklist() {
+                const current = getCurrentChecklist();
+                if (!current || current.isShared) return;
+                const id = 'cl_' + Date.now();
+                const copy = JSON.parse(JSON.stringify(current));
+                copy.id = id;
+                copy.name = current.name + ' (копия)';
+                copy.selectedItems = { ...current.selectedItems };
+                appState.checklists.push(copy);
+                appState.currentChecklistId = id;
+                persistData();
+                renderAll();
+            }
+
+            function renameChecklist(newName) {
+                const cl = appState.checklists.find(c => c.id === appState.currentChecklistId);
+                if (cl && newName.trim()) { cl.name = newName.trim();
+                    persistData();
+                    renderChecklistTabs(); }
+            }
+
+            function deleteChecklist() {
+                if (appState.checklists.length <= 1) { showToast('Нельзя удалить последний список'); return; }
+                const cl = appState.checklists.find(c => c.id === appState.currentChecklistId);
+                if (!cl) return;
+                confirmDelete(`Удалить список «${cl.name}»?`, () => {
+                    appState.checklists = appState.checklists.filter(c => c.id !== cl.id);
+                    appState.currentChecklistId = appState.checklists[0]?.id;
+                    appState.isSharedChecklistActive = false;
+                    appState.sharedSessionId = null;
+                    persistData();
+                    renderAll();
+                });
+            }
+
+            function switchChecklist(id) {
+                appState.currentChecklistId = id;
+                appState.isSharedChecklistActive = false;
+                appState.sharedSessionId = null;
+                if (appState.sharedSessionUnsubscribe) { appState.sharedSessionUnsubscribe();
+                    appState.sharedSessionUnsubscribe = null; }
+                appState.sharedSessionData = null;
+                appState.isAdminOfCurrentSession = false;
+                persistData();
+                renderAll();
+            }
+
+            function switchToSharedSession(sessionId) {
+                appState.sharedSessionId = sessionId;
+                appState.isSharedChecklistActive = true;
+                appState.currentChecklistId = null;
+                subscribeToSharedSession(sessionId);
+                persistData();
+                renderAll();
+            }
+
+            function saveToLocalStorage() {
+                const data = {
+                    currentUsername: appState.currentUser?.username,
+                    passwordHash: appState.currentUser?.passwordHash,
                     checklists: appState.checklists,
                     currentChecklistId: appState.currentChecklistId,
                     theme: appState.theme,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                }, { merge: true });
-                dom.syncBadge.textContent = '☁️ Облако'; dom.syncBadge.className = 'sync-badge synced';
-            } catch(e) {
-                dom.syncBadge.textContent = '⚠️ Ошибка'; dom.syncBadge.className = 'sync-badge pending';
+                    sharedSessionsMeta: appState.sharedSessionsMeta,
+                };
+                localStorage.setItem('hikingChecklistPro', JSON.stringify(data));
             }
-        }
 
-        async function loadUserDataFromCloud(username) {
-            if (!appState.firebaseAvailable || !appState.db) return null;
-            try {
-                const doc = await appState.db.collection('users').doc('user_' + username.toLowerCase()).get();
-                return doc.exists ? doc.data() : null;
-            } catch(e) { return null; }
-        }
-
-        async function persistData() {
-            saveToLocalStorage();
-            if (appState.firebaseAvailable && appState.currentUser && !appState.currentUser.isGuest) {
-                await saveUserDataToCloud(appState.currentUser.username, appState.currentUser.passwordHash);
+            function loadFromLocalStorage() {
+                const raw = localStorage.getItem('hikingChecklistPro');
+                if (raw) {
+                    try { return JSON.parse(raw); } catch (e) {}
+                }
+                return null;
             }
-        }
 
-        function initFirebase() {
-            if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
-                appState.firebaseAvailable = false;
-                return Promise.resolve(false);
-            }
-            try {
-                firebase.initializeApp(firebaseConfig);
-                const db = firebase.firestore();
-                return db.collection('_ping').doc('test').set({ time: Date.now() }, { merge: true })
-                    .then(() => {
-                        appState.firebaseAvailable = true;
-                        appState.db = db;
-                        return true;
-                    }).catch(() => { appState.firebaseAvailable = false; return false; });
-            } catch(e) { appState.firebaseAvailable = false; return Promise.resolve(false); }
-        }
-
-        // ============ СОВМЕСТНЫЙ ПОХОД ============
-        async function createSharedSession() {
-            const cl = getCurrentChecklist();
-            if (!cl || !appState.firebaseAvailable) { showToast('Нет облака или списка'); return; }
-            const sessionId = 'session_' + Date.now();
-            const username = appState.currentUser.username;
-            try {
-                await appState.db.collection('sharedSessions').doc(sessionId).set({
-                    checklistData: cl.checklistData,
-                    userCategories: cl.userCategories,
-                    name: cl.name,
-                    creator: username,
-                    participants: {
-                        [username]: { name: username, checkedItems: { ...cl.selectedItems } }
-                    },
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                appState.sharedSessionId = sessionId;
-                subscribeToSharedSession(sessionId);
-                const link = `${window.location.origin}${window.location.pathname}?session=${sessionId}`;
-                await navigator.clipboard.writeText(link);
-                showToast('Совместный поход создан! Ссылка скопирована.');
-            } catch(e) { showToast('Ошибка создания сессии'); }
-        }
-
-        async function joinSharedSession(sessionId, userName) {
-            if (!appState.firebaseAvailable) { showToast('Нет облака'); return; }
-            try {
-                const docRef = appState.db.collection('sharedSessions').doc(sessionId);
-                const doc = await docRef.get();
-                if (!doc.exists) { showToast('Сессия не найдена'); return; }
-                const data = doc.data();
-                if (!data.participants) data.participants = {};
-                if (data.participants[userName]) { showToast('Имя уже занято в этой сессии'); return; }
-                data.participants[userName] = { name: userName, checkedItems: {} };
-                await docRef.update({ participants: data.participants });
-                appState.sharedSessionId = sessionId;
-                appState.currentUser = { username: userName, isGuest: true };
-                appState.checklists = [{
-                    id: 'shared_checklist',
-                    name: data.name || 'Совместный поход',
-                    tripDate: '',
-                    checklistData: data.checklistData,
-                    userCategories: data.userCategories || [],
-                    selectedItems: {},
-                    collapsedCategories: {}
-                }];
-                appState.currentChecklistId = 'shared_checklist';
-                subscribeToSharedSession(sessionId);
-                renderApp();
-            } catch(e) { showToast('Ошибка подключения'); }
-        }
-
-        function subscribeToSharedSession(sessionId) {
-            if (appState.sharedSessionUnsubscribe) appState.sharedSessionUnsubscribe();
-            const unsub = appState.db.collection('sharedSessions').doc(sessionId)
-                .onSnapshot((doc) => {
-                    if (!doc.exists) { leaveSharedSession(); return; }
-                    appState.sharedSessionData = doc.data();
-                    const myName = appState.currentUser?.username;
-                    if (myName && appState.sharedSessionData.participants[myName]) {
-                        const myChecked = appState.sharedSessionData.participants[myName].checkedItems || {};
-                        const cl = getCurrentChecklist();
-                        if (cl) cl.selectedItems = { ...myChecked };
-                    }
-                    renderAll();
-                }, (err) => {
-                    console.error(err);
-                    showToast('Ошибка синхронизации');
-                });
-            appState.sharedSessionUnsubscribe = unsub;
-        }
-
-        async function toggleSharedItem(itemId) {
-            if (!appState.sharedSessionId || !appState.firebaseAvailable) return;
-            const myName = appState.currentUser?.username;
-            if (!myName) return;
-            const current = appState.sharedSessionData?.participants?.[myName]?.checkedItems?.[itemId];
-            const newChecked = !current;
-            const updatePath = `participants.${myName}.checkedItems.${itemId}`;
-            try {
-                await appState.db.collection('sharedSessions').doc(appState.sharedSessionId).update({
-                    [updatePath]: newChecked || firebase.firestore.FieldValue.delete()
-                });
-            } catch(e) { showToast('Ошибка обновления'); }
-        }
-
-        function leaveSharedSession() {
-            if (appState.sharedSessionUnsubscribe) { appState.sharedSessionUnsubscribe(); appState.sharedSessionUnsubscribe = null; }
-            appState.sharedSessionId = null;
-            appState.sharedSessionData = null;
-            if (appState.currentUser?.isGuest) {
-                appState.currentUser = null;
-                appState.checklists = [];
-                appState.currentChecklistId = null;
-                showLoginScreen();
-            } else {
-                renderApp();
-            }
-        }
-
-        function getSharedParticipantsProgress() {
-            if (!appState.sharedSessionData || !appState.sharedSessionData.checklistData) return [];
-            const totalItems = appState.sharedSessionData.checklistData.reduce((sum, cat) => sum + cat.items.length, 0);
-            const participants = appState.sharedSessionData.participants || {};
-            return Object.entries(participants).map(([name, data]) => {
-                const checked = data.checkedItems || {};
-                const done = Object.values(checked).filter(v => v).length;
-                return { name, done, total: totalItems, percent: totalItems ? Math.round((done / totalItems) * 100) : 0 };
-            });
-        }
-
-        // ============ ОСТАЛЬНЫЕ ФУНКЦИИ ============
-        async function handleLogin() {
-            const username = dom.loginUsername.value.trim();
-            const password = dom.loginPassword.value;
-            if (!username || !password) { showAlert('Введите логин и пароль', 'error'); return; }
-            const passwordHash = hashPassword(password);
-
-            if (appState.firebaseAvailable) {
-                const cloudData = await loadUserDataFromCloud(username);
-                if (cloudData && cloudData.passwordHash === passwordHash) {
-                    appState.currentUser = { username, passwordHash };
-                    appState.checklists = cloudData.checklists || [];
-                    appState.currentChecklistId = cloudData.currentChecklistId || appState.checklists[0]?.id;
-                    appState.theme = cloudData.theme || 'light';
-                    applyTheme();
-                    saveToLocalStorage();
-                    showAlert('✅ Вход (облако)', 'success');
-                    renderApp(); return;
-                } else if (cloudData && cloudData.passwordHash !== passwordHash) {
-                    showAlert('❌ Неверный пароль', 'error'); return;
+            async function saveUserDataToCloud(username, passwordHash) {
+                if (!appState.firebaseAvailable || !appState.db) return;
+                try {
+                    await appState.db.collection('users').doc('user_' + username.toLowerCase()).set({
+                        username,
+                        passwordHash,
+                        checklists: appState.checklists,
+                        currentChecklistId: appState.currentChecklistId,
+                        theme: appState.theme,
+                        sharedSessionsMeta: appState.sharedSessionsMeta,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    }, { merge: true });
+                    dom.syncBadge.textContent = '☁️ Облако';
+                    dom.syncBadge.className = 'sync-badge synced';
+                } catch (e) {
+                    dom.syncBadge.textContent = '⚠️ Ошибка';
+                    dom.syncBadge.className = 'sync-badge pending';
                 }
             }
 
-            const localData = loadFromLocalStorage();
-            if (localData && localData.currentUsername === username && localData.passwordHash === passwordHash) {
-                appState.currentUser = { username, passwordHash };
-                appState.checklists = localData.checklists || [];
-                appState.currentChecklistId = localData.currentChecklistId || appState.checklists[0]?.id;
-                appState.theme = localData.theme || 'light';
-                applyTheme();
-                if (appState.firebaseAvailable) await persistData();
-                showAlert('✅ Вход (локально)', 'success');
-                renderApp(); return;
-            }
-
-            if (!appState.firebaseAvailable && !localData) {
-                appState.currentUser = { username, passwordHash };
-                createNewChecklist('Мой первый поход');
-                applyTheme();
-                showAlert('✅ Новый профиль', 'success');
-                renderApp(); return;
-            }
-            showAlert('❌ Неверный логин или пароль', 'error');
-        }
-
-        async function handleRegister() {
-            const username = dom.regUsername.value.trim();
-            const password = dom.regPassword.value;
-            const password2 = dom.regPassword2.value;
-            if (username.length < 3) { showAlert('Логин не менее 3 символов', 'error'); return; }
-            if (password.length < 4) { showAlert('Пароль не менее 4 символов', 'error'); return; }
-            if (password !== password2) { showAlert('Пароли не совпадают', 'error'); return; }
-            const passwordHash = hashPassword(password);
-
-            if (appState.firebaseAvailable) {
-                const existing = await loadUserDataFromCloud(username);
-                if (existing) { showAlert('❌ Пользователь существует', 'error'); return; }
-            } else {
-                const local = loadFromLocalStorage();
-                if (local && local.currentUsername === username) { showAlert('❌ Пользователь существует локально', 'error'); return; }
-            }
-
-            appState.currentUser = { username, passwordHash };
-            appState.checklists = [];
-            createNewChecklist('Мой первый поход');
-            appState.theme = 'light';
-            applyTheme();
-            await persistData();
-            showAlert('✅ Регистрация успешна!', 'success');
-            renderApp();
-        }
-
-        function handleLogout() {
-            if (appState.sharedSessionId) leaveSharedSession();
-            appState.currentUser = null;
-            appState.checklists = [];
-            appState.currentChecklistId = null;
-            saveToLocalStorage();
-            dom.syncBadge.textContent = '💾 Локально';
-            showLoginScreen();
-        }
-
-        function applyTheme() {
-            document.body.classList.toggle('dark', appState.theme === 'dark');
-            localStorage.setItem('theme', appState.theme);
-        }
-        function toggleTheme() {
-            appState.theme = appState.theme === 'light' ? 'dark' : 'light';
-            applyTheme();
-            persistData();
-        }
-
-        function resetChecks() {
-            const cl = getCurrentChecklist();
-            if (!cl || appState.sharedSessionId) return;
-            confirmDelete('Снять все отметки в текущем списке?', () => {
-                cl.selectedItems = {};
-                persistData();
-                renderAll();
-                showToast('Отметки сброшены');
-            });
-        }
-
-        function exportChecklist() {
-            const cl = getCurrentChecklist();
-            if (!cl) return;
-            const data = { name: cl.name, checklistData: cl.checklistData, userCategories: cl.userCategories };
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a'); a.href = url; a.download = 'checklist.json'; a.click();
-            URL.revokeObjectURL(url);
-        }
-
-        function importChecklist(file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
+            async function loadUserDataFromCloud(username) {
+                if (!appState.firebaseAvailable || !appState.db) return null;
                 try {
-                    const data = JSON.parse(e.target.result);
-                    if (!data.checklistData) throw new Error();
-                    const newCL = {
-                        id: 'cl_import_' + Date.now(),
-                        name: data.name || 'Импортированный список',
-                        tripDate: '',
-                        checklistData: data.checklistData,
-                        userCategories: data.userCategories || [],
-                        selectedItems: {},
-                        collapsedCategories: {}
-                    };
-                    appState.checklists.push(newCL);
-                    appState.currentChecklistId = newCL.id;
-                    persistData();
-                    renderAll();
-                    showToast('Список импортирован!');
-                } catch(ex) { showToast('Ошибка формата файла'); }
-            };
-            reader.readAsText(file);
-        }
-
-        function updateProgressAndWeight() {
-            const cl = getCurrentChecklist();
-            let selected = 0, total = 0, weight = 0;
-            if (cl) {
-                cl.checklistData.forEach(cat => cat.items.forEach(item => {
-                    total++;
-                    if (cl.selectedItems[item.id]) { selected++; weight += (item.weight || 0); }
-                }));
+                    const doc = await appState.db.collection('users').doc('user_' + username.toLowerCase()).get();
+                    return doc.exists ? doc.data() : null;
+                } catch (e) { return null; }
             }
-            dom.selectedCount.textContent = selected;
-            dom.totalCount.textContent = total;
-            dom.progressFill.style.width = (total ? Math.round((selected/total)*100) : 0) + '%';
-            dom.totalWeight.textContent = weight;
-        }
 
-        function getCategoryProgress(cat, selectedItems) {
-            const total = cat.items.length;
-            const done = cat.items.filter(i => selectedItems[i.id]).length;
-            return total ? `${done}/${total} (${Math.round(done/total*100)}%)` : '';
-        }
+            async function persistData() {
+                saveToLocalStorage();
+                if (appState.firebaseAvailable && appState.currentUser && !appState.currentUser.isGuest) {
+                    await saveUserDataToCloud(appState.currentUser.username, appState.currentUser.passwordHash);
+                }
+            }
 
-        function renderChecklistTabs() {
-            dom.checklistTabs.innerHTML = '';
-            appState.checklists.forEach(cl => {
-                const tab = document.createElement('div');
-                tab.className = 'checklist-tab' + (cl.id === appState.currentChecklistId ? ' active' : '');
-                tab.textContent = cl.name;
-                tab.addEventListener('click', () => switchChecklist(cl.id));
-                dom.checklistTabs.appendChild(tab);
-            });
-        }
+            function initFirebase() {
+                if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
+                    appState.firebaseAvailable = false;
+                    return Promise.resolve(false);
+                }
+                try {
+                    firebase.initializeApp(firebaseConfig);
+                    const db = firebase.firestore();
+                    return db.collection('_ping').doc('test').set({ time: Date.now() }, { merge: true })
+                        .then(() => {
+                            appState.firebaseAvailable = true;
+                            appState.db = db;
+                            return true;
+                        }).catch(() => { appState.firebaseAvailable = false; return false; });
+                } catch (e) { appState.firebaseAvailable = false; return Promise.resolve(false); }
+            }
 
-        function renderChecklist() {
-            const cl = getCurrentChecklist();
-            if (!cl) return;
-            const searchTerm = dom.searchInput.value.toLowerCase();
-            const filter = dom.filterSelect.value;
+            async function loadSharedSessionsMeta() {
+                if (!appState.firebaseAvailable || !appState.currentUser) return;
+                try {
+                    const snapshot = await appState.db.collection('sharedSessions')
+                        .where('participants.' + appState.currentUser.username + '.name', '==', appState
+                            .currentUser.username)
+                        .get();
+                    const sessions = [];
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        sessions.push({
+                            id: doc.id,
+                            name: data.name || 'Совместный поход',
+                            creator: data.creator,
+                            role: data.participants?.[appState.currentUser.username]?.role || 'participant',
+                            updatedAt: data.updatedAt,
+                        });
+                    });
+                    sessions.sort((a, b) => (b.updatedAt?.toMillis?.() || 0) - (a.updatedAt?.toMillis?.() || 0));
+                    appState.sharedSessionsMeta = sessions;
+                    await persistData();
+                    renderSharedChecklistTabs();
+                } catch (e) {
+                    console.error('Ошибка загрузки совместных сессий:', e);
+                }
+            }
 
-            dom.checklistContent.innerHTML = '';
-            cl.checklistData.forEach(cat => {
-                let filteredItems = cat.items;
-                if (searchTerm) filteredItems = filteredItems.filter(i => i.text.toLowerCase().includes(searchTerm));
-                if (filter === 'required') filteredItems = filteredItems.filter(i => i.required);
-                if (filter === 'optional') filteredItems = filteredItems.filter(i => !i.required);
-                if (filter === 'checked') filteredItems = filteredItems.filter(i => cl.selectedItems[i.id]);
-                if (filter === 'unchecked') filteredItems = filteredItems.filter(i => !cl.selectedItems[i.id]);
+            async function createSharedSession() {
+                const cl = getCurrentChecklist();
+                if (!cl || cl.isShared) { showToast('Выберите личный список для создания совместного похода'); return; }
+                if (!appState.firebaseAvailable) { showToast('Требуется подключение к облаку'); return; }
+                const sessionId = 'session_' + Date.now();
+                const username = appState.currentUser.username;
+                try {
+                    await appState.db.collection('sharedSessions').doc(sessionId).set({
+                        checklistData: JSON.parse(JSON.stringify(cl.checklistData)),
+                        userCategories: JSON.parse(JSON.stringify(cl.userCategories || [])),
+                        name: cl.name + ' (совместный)',
+                        creator: username,
+                        participants: {
+                            [username]: { name: username, role: 'admin', checkedItems: { ...cl.selectedItems } }
+                        },
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    });
+                    appState.sharedSessionId = sessionId;
+                    appState.isSharedChecklistActive = true;
+                    appState.isAdminOfCurrentSession = true;
+                    appState.currentChecklistId = null;
+                    subscribeToSharedSession(sessionId);
+                    await loadSharedSessionsMeta();
+                    const link = `${window.location.origin}${window.location.pathname}?session=${sessionId}`;
+                    try {
+                        await navigator.clipboard.writeText(link);
+                        showToast('✅ Совместный поход создан! Ссылка скопирована.');
+                    } catch (e) {
+                        showToast('✅ Совместный поход создан! ID: ' + sessionId);
+                    }
+                    renderAll();
+                } catch (e) { showToast('Ошибка создания сессии: ' + e.message); }
+            }
 
-                const isCollapsed = !!cl.collapsedCategories[cat.id];
-                const card = document.createElement('div');
-                card.className = 'category-card' + (isCollapsed ? '' : ' expanded');
-                card.dataset.catId = cat.id;
-                const allSelected = cat.items.length && cat.items.every(i => cl.selectedItems[i.id]);
-                const progress = getCategoryProgress(cat, cl.selectedItems);
-                card.innerHTML = `
-                    <div class="category-header" data-action="toggle-collapse">
-                        <div class="category-title">
-                            <span>${escapeHTML(cat.category)}</span>
-                            ${cat.isDefault ? '<span class="badge-default">базовая</span>' : ''}
-                        </div>
-                        <span class="category-progress">${progress}</span>
-                        <div class="category-actions">
-                            <button class="btn btn-sm btn-ghost" data-action="toggle-items">${allSelected ? '☑️ Снять' : '☐ Выбрать'}</button>
-                            ${!cat.isDefault && !appState.sharedSessionId ? '<button class="btn-icon" data-action="delete-cat" style="color:var(--danger);">🗑️</button>' : ''}
-                            <span class="collapse-icon">▼</span>
-                        </div>
-                    </div>
-                    <div class="items-wrapper">
-                        <div class="items-grid" data-cat-id="${cat.id}">
-                            ${filteredItems.map(item => {
-                                const checked = !!cl.selectedItems[item.id];
-                                return `<div class="item-card" data-item-id="${item.id}">
-                                    <div class="item-checkbox ${checked ? 'checked' : ''}">${checked ? '✓' : ''}</div>
-                                    <div class="item-text">${escapeHTML(item.text)}</div>
-                                    ${item.weight ? `<span class="weight-badge" data-action="edit-weight">⚖️ ${item.weight}г</span>` : ''}
-                                    <span class="weight-badge" data-action="edit-weight" style="cursor:pointer;">⚖️</span>
-                                    ${item.optional ? '<span class="item-badge badge-optional">необяз.</span>' : ''}
-                                    ${item.required ? '<span class="item-badge badge-required">обяз.</span>' : ''}
-                                    ${!appState.sharedSessionId ? '<button class="btn-icon item-delete-btn" data-action="delete-item" title="Удалить">🗑️</button>' : ''}
-                                </div>`;
-                            }).join('')}
-                        </div>
-                        ${!appState.sharedSessionId ? '<button class="add-item-btn" data-action="add-item">+ Добавить предмет</button>' : ''}
-                    </div>`;
-                card.addEventListener('click', function(e) {
-                    if (appState.sharedSessionId) {
-                        const itemCard = e.target.closest('.item-card');
-                        if (itemCard) {
-                            const itemId = itemCard.dataset.itemId;
-                            if (itemId) { e.stopPropagation(); toggleSharedItem(itemId); }
+            async function joinSharedSession(sessionId, userName) {
+                if (!appState.firebaseAvailable) { showToast('Требуется облако'); return; }
+                if (!userName || userName.trim().length < 2) { showToast('Введите имя (минимум 2 символа)'); return; }
+                try {
+                    const docRef = appState.db.collection('sharedSessions').doc(sessionId);
+                    const doc = await docRef.get();
+                    if (!doc.exists) { showToast('Сессия не найдена'); return; }
+                    const data = doc.data();
+                    if (!data.participants) data.participants = {};
+                    if (data.participants[userName]) { showToast('Имя уже занято в этой сессии'); return; }
+                    data.participants[userName] = { name: userName, role: 'participant', checkedItems: {} };
+                    await docRef.update({
+                        participants: data.participants,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    if (!appState.currentUser || appState.currentUser.isGuest) {
+                        appState.currentUser = { username: userName, isGuest: true, passwordHash: '' };
+                    }
+                    appState.sharedSessionId = sessionId;
+                    appState.isSharedChecklistActive = true;
+                    appState.isAdminOfCurrentSession = false;
+                    appState.currentChecklistId = null;
+                    subscribeToSharedSession(sessionId);
+                    await loadSharedSessionsMeta();
+                    renderApp();
+                    showToast('✅ Вы присоединились к совместному походу!');
+                } catch (e) { showToast('Ошибка подключения: ' + e.message); }
+            }
+
+            function subscribeToSharedSession(sessionId) {
+                if (appState.sharedSessionUnsubscribe) appState.sharedSessionUnsubscribe();
+                const unsub = appState.db.collection('sharedSessions').doc(sessionId)
+                    .onSnapshot((doc) => {
+                        if (!doc.exists) {
+                            showToast('Сессия была удалена');
+                            leaveSharedSession();
+                            return;
                         }
-                        return;
-                    }
-                    const action = e.target.closest('[data-action]')?.dataset?.action;
-                    if (action === 'toggle-collapse' && !e.target.closest('button') && !e.target.closest('.item-card')) {
-                        cl.collapsedCategories[cat.id] = !cl.collapsedCategories[cat.id]; persistData(); renderAll(); return;
-                    }
-                    if (action === 'toggle-items') { e.stopPropagation(); toggleCategoryItems(cat.id, !allSelected); return; }
-                    if (action === 'delete-cat') { e.stopPropagation(); deleteCategory(cat.id); return; }
-                    if (action === 'add-item') { e.stopPropagation(); showAddItemModal(cat.id); return; }
-                    if (action === 'delete-item') {
-                        const itemId = e.target.closest('.item-card')?.dataset.itemId;
-                        if (itemId) { e.stopPropagation(); deleteItem(cat.id, itemId); }
-                        return;
-                    }
-                    if (action === 'edit-weight') {
-                        const itemId = e.target.closest('.item-card')?.dataset.itemId;
-                        if (itemId) { e.stopPropagation(); editItemWeight(cat.id, itemId); }
-                        return;
-                    }
-                    const itemCard = e.target.closest('.item-card');
-                    if (itemCard && !e.target.closest('button')) {
-                        const itemId = itemCard.dataset.itemId;
-                        if (itemId) { e.stopPropagation(); toggleItem(itemId); }
+                        appState.sharedSessionData = doc.data();
+                        appState.isAdminOfCurrentSession = getMySharedRole() === 'admin';
+                        if (appState.sharedSessionData && appState.currentUser && !appState.sharedSessionData
+                            .participants?.[appState.currentUser.username]) {
+                            leaveSharedSession();
+                            showToast('Вы были удалены из сессии');
+                            return;
+                        }
+                        updateSharedSessionsMetaFromSnapshot(sessionId, doc.data());
+                        renderAll();
+                    }, (err) => {
+                        console.error('Ошибка синхронизации:', err);
+                        showToast('Ошибка синхронизации с сервером');
+                    });
+                appState.sharedSessionUnsubscribe = unsub;
+            }
+
+            function updateSharedSessionsMetaFromSnapshot(sessionId, data) {
+                const existing = appState.sharedSessionsMeta.find(s => s.id === sessionId);
+                const meta = {
+                    id: sessionId,
+                    name: data?.name || 'Совместный поход',
+                    creator: data?.creator,
+                    role: data?.participants?.[appState.currentUser?.username]?.role || 'participant',
+                    updatedAt: data?.updatedAt,
+                };
+                if (existing) {
+                    Object.assign(existing, meta);
+                } else {
+                    appState.sharedSessionsMeta.push(meta);
+                }
+                appState.sharedSessionsMeta.sort((a, b) => (b.updatedAt?.toMillis?.() || 0) - (a.updatedAt?.toMillis?.() ||
+                    0));
+                persistData();
+                renderSharedChecklistTabs();
+            }
+
+            async function toggleSharedItem(itemId) {
+                if (!appState.sharedSessionId || !appState.firebaseAvailable) return;
+                const myName = appState.currentUser?.username;
+                if (!myName) return;
+                const currentChecked = appState.sharedSessionData?.participants?.[myName]?.checkedItems || {};
+                const newChecked = !currentChecked[itemId];
+                const newCheckedItems = { ...currentChecked };
+                if (newChecked) {
+                    newCheckedItems[itemId] = true;
+                } else {
+                    delete newCheckedItems[itemId];
+                }
+                try {
+                    await appState.db.collection('sharedSessions').doc(appState.sharedSessionId).update({
+                        [`participants.${myName}.checkedItems`]: newCheckedItems,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    });
+                } catch (e) { showToast('Ошибка обновления'); }
+            }
+
+            async function toggleAllSharedItems(catId, selectAll) {
+                if (!appState.sharedSessionId || !appState.firebaseAvailable) return;
+                const myName = appState.currentUser?.username;
+                if (!myName) return;
+                const cl = getCurrentChecklist();
+                const cat = cl.checklistData.find(c => c.id === catId);
+                if (!cat) return;
+                const currentChecked = appState.sharedSessionData?.participants?.[myName]?.checkedItems || {};
+                const newCheckedItems = { ...currentChecked };
+                cat.items.forEach(item => {
+                    if (selectAll) {
+                        newCheckedItems[item.id] = true;
+                    } else {
+                        delete newCheckedItems[item.id];
                     }
                 });
-                dom.checklistContent.appendChild(card);
-            });
+                try {
+                    await appState.db.collection('sharedSessions').doc(appState.sharedSessionId).update({
+                        [`participants.${myName}.checkedItems`]: newCheckedItems,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    });
+                } catch (e) { showToast('Ошибка обновления'); }
+            }
 
-            document.querySelectorAll('.items-grid').forEach(grid => {
-                if (grid.sortableInstance) grid.sortableInstance.destroy();
-                if (!appState.sharedSessionId) {
-                    grid.sortableInstance = new Sortable(grid, {
-                        group: 'items',
-                        animation: 150,
-                        ghostClass: 'sortable-ghost',
-                        onEnd: function(evt) {
-                            const catId = evt.to.dataset.catId;
-                            const cat = cl.checklistData.find(c => c.id === catId);
-                            if (!cat) return;
-                            const movedItemId = evt.item.dataset.itemId;
-                            const oldIndex = evt.oldIndex;
-                            const newIndex = evt.newIndex;
-                            if (oldIndex !== newIndex) {
-                                const item = cat.items.splice(oldIndex, 1)[0];
-                                cat.items.splice(newIndex, 0, item);
-                                persistData();
-                            }
+            async function changeParticipantRole(participantName, newRole) {
+                if (!appState.sharedSessionId || !appState.isAdminOfCurrentSession) return;
+                try {
+                    await appState.db.collection('sharedSessions').doc(appState.sharedSessionId).update({
+                        [`participants.${participantName}.role`]: newRole,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    });
+                    showToast(`Роль обновлена: ${participantName} → ${newRole}`);
+                } catch (e) { showToast('Ошибка изменения роли'); }
+            }
+
+            async function removeParticipant(participantName) {
+                if (!appState.sharedSessionId || !appState.isAdminOfCurrentSession) return;
+                confirmDelete(`Удалить участника «${participantName}» из совместного похода?`, async () => {
+                    try {
+                        const data = appState.sharedSessionData;
+                        if (data && data.participants) {
+                            const updated = { ...data.participants };
+                            delete updated[participantName];
+                            await appState.db.collection('sharedSessions').doc(appState.sharedSessionId)
+                                .update({
+                                    participants: updated,
+                                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                                });
+                            showToast(`Участник ${participantName} удалён`);
+                        }
+                    } catch (e) { showToast('Ошибка удаления участника'); }
+                });
+            }
+
+            async function deleteSharedSession() {
+                if (!appState.sharedSessionId || !appState.isAdminOfCurrentSession) return;
+                confirmDelete('Полностью удалить этот совместный поход? Это действие необратимо!', async () => {
+                    try {
+                        await appState.db.collection('sharedSessions').doc(appState.sharedSessionId).delete();
+                        showToast('Совместный поход удалён');
+                        leaveSharedSession();
+                    } catch (e) { showToast('Ошибка удаления сессии'); }
+                });
+            }
+
+            function showManageSharedModal() {
+                if (!appState.sharedSessionData || !appState.isAdminOfCurrentSession) return;
+                const participants = appState.sharedSessionData.participants || {};
+                let rows = '';
+                for (const [name, pData] of Object.entries(participants)) {
+                    const role = pData.role || 'participant';
+                    const isMe = name === appState.currentUser?.username;
+                    rows += `
+                        <div class="participant-row">
+                            <span class="participant-name">
+                                ${escapeHTML(name)} ${isMe ? '(вы)' : ''}
+                                <span class="role-badge role-${role}">${role}</span>
+                            </span>
+                            <div style="display:flex;gap:4px;">
+                                ${!isMe ? `
+                                    <button class="btn btn-xs btn-outline" data-action="toggle-role" data-name="${escapeHTML(name)}" data-role="${role === 'admin' ? 'participant' : 'admin'}">
+                                        ${role === 'admin' ? '⬇ В участники' : '⬆ В админы'}
+                                    </button>
+                                    <button class="btn btn-xs btn-danger" data-action="remove-participant" data-name="${escapeHTML(name)}">🗑️</button>
+                                ` : '<span style="font-size:0.7rem;color:var(--text-light);">это вы</span>'}
+                            </div>
+                        </div>`;
+                }
+                const contentHTML = `
+                    <p style="margin-bottom:12px;color:var(--text-light);">Управление участниками и ролями.</p>
+                    <div>${rows}</div>
+                    <hr style="margin:16px 0;border-color:var(--border);">
+                    <button class="btn btn-danger btn-sm" data-action="delete-session" style="width:100%;">🗑️ Удалить весь совместный поход</button>
+                `;
+                openModal('⚙️ Управление совместным походом', contentHTML, (modal) => {
+                    return false;
+                });
+                setTimeout(() => {
+                    const modal = document.querySelector('.modal');
+                    if (!modal) return;
+                    modal.addEventListener('click', (e) => {
+                        const btn = e.target.closest('[data-action]');
+                        if (!btn) return;
+                        const action = btn.dataset.action;
+                        if (action === 'toggle-role') {
+                            const name = btn.dataset.name;
+                            const newRole = btn.dataset.role;
+                            changeParticipantRole(name, newRole);
+                            modal.closest('.modal-overlay')?.remove();
+                        }
+                        if (action === 'remove-participant') {
+                            const name = btn.dataset.name;
+                            modal.closest('.modal-overlay')?.remove();
+                            removeParticipant(name);
+                        }
+                        if (action === 'delete-session') {
+                            modal.closest('.modal-overlay')?.remove();
+                            deleteSharedSession();
                         }
                     });
+                }, 150);
+            }
+
+            function leaveSharedSession() {
+                if (appState.sharedSessionUnsubscribe) { appState.sharedSessionUnsubscribe();
+                    appState.sharedSessionUnsubscribe = null; }
+                appState.sharedSessionId = null;
+                appState.isSharedChecklistActive = false;
+                appState.sharedSessionData = null;
+                appState.isAdminOfCurrentSession = false;
+                if (appState.currentUser?.isGuest) {
+                    appState.currentUser = null;
+                    appState.checklists = [];
+                    appState.currentChecklistId = null;
+                    showLoginScreen();
+                } else {
+                    if (!appState.currentChecklistId && appState.checklists.length > 0) {
+                        appState.currentChecklistId = appState.checklists[0].id;
+                    }
+                    loadSharedSessionsMeta();
+                    persistData();
+                    renderApp();
                 }
-            });
-
-            updateProgressAndWeight();
-            updateCollapseButtons();
-            renderSharedSessionBox();
-        }
-
-        function renderSharedSessionBox() {
-            if (appState.sharedSessionId && appState.sharedSessionData) {
-                dom.sharedSessionBox.classList.remove('hidden');
-                const participants = getSharedParticipantsProgress();
-                dom.sharedParticipants.innerHTML = participants.map(p => `
-                    <div class="participant-row">
-                        <span class="participant-name">${escapeHTML(p.name)}</span>
-                        <span class="participant-progress">${p.done}/${p.total} (${p.percent}%)</span>
-                    </div>
-                `).join('');
-            } else {
-                dom.sharedSessionBox.classList.add('hidden');
-            }
-        }
-
-        function toggleItem(itemId) {
-            const cl = getCurrentChecklist();
-            if (!cl || appState.sharedSessionId) return;
-            cl.selectedItems[itemId] = !cl.selectedItems[itemId];
-            persistData();
-            renderAll();
-        }
-
-        function toggleCategoryItems(catId, selectAll) {
-            const cl = getCurrentChecklist();
-            const cat = cl.checklistData.find(c => c.id === catId);
-            if (!cat) return;
-            cat.items.forEach(i => { cl.selectedItems[i.id] = selectAll; });
-            persistData();
-            renderAll();
-        }
-
-        function deleteItem(catId, itemId) {
-            const cl = getCurrentChecklist();
-            const cat = cl.checklistData.find(c => c.id === catId);
-            if (!cat) return;
-            const item = cat.items.find(i => i.id === itemId);
-            confirmDelete(`Удалить «${item.text}»?`, () => {
-                cat.items = cat.items.filter(i => i.id !== itemId);
-                delete cl.selectedItems[itemId];
-                const uc = cl.userCategories?.find(c => c.id === catId);
-                if (uc) uc.items = uc.items.filter(i => i.id !== itemId);
-                persistData();
-                renderAll();
-            });
-        }
-
-        function deleteCategory(catId) {
-            const cl = getCurrentChecklist();
-            const cat = cl.checklistData.find(c => c.id === catId);
-            if (!cat || cat.isDefault) { showToast('Базовые категории нельзя удалить'); return; }
-            confirmDelete(`Удалить категорию «${cat.category}»?`, () => {
-                cl.checklistData = cl.checklistData.filter(c => c.id !== catId);
-                cl.userCategories = (cl.userCategories || []).filter(c => c.id !== catId);
-                cat.items.forEach(i => delete cl.selectedItems[i.id]);
-                persistData();
-                renderAll();
-            });
-        }
-
-        function editItemWeight(catId, itemId) {
-            const cl = getCurrentChecklist();
-            const cat = cl.checklistData.find(c => c.id === catId);
-            const item = cat?.items.find(i => i.id === itemId);
-            if (!item) return;
-            const newWeight = prompt('Вес в граммах (0 - не указан):', item.weight || 0);
-            if (newWeight !== null && !isNaN(newWeight)) {
-                item.weight = Math.max(0, parseInt(newWeight) || 0);
-                persistData();
-                renderAll();
-            }
-        }
-
-        function showAddItemModal(catId) {
-            const cl = getCurrentChecklist();
-            const cat = cl.checklistData.find(c => c.id === catId);
-            openModal(`➕ Элемент в «${cat.category}»`, `
-                <div class="form-group"><label class="form-label">Название</label><input class="form-input modal-name" placeholder="Название"></div>
-                <div class="form-group"><label class="form-label">Тип</label><select class="form-input modal-type"><option value="required">Обязательный</option><option value="optional">Необязательный</option></select></div>
-                <div class="form-group"><label class="form-label">Вес (г)</label><input class="form-input modal-weight" type="number" value="0" min="0"></div>
-            `, (modal) => {
-                const name = modal.querySelector('.modal-name').value.trim();
-                if (!name) { showToast('Введите название'); return false; }
-                const type = modal.querySelector('.modal-type').value;
-                const weight = parseInt(modal.querySelector('.modal-weight').value) || 0;
-                const newItem = { id: 'item_' + Date.now(), text: name, required: type === 'required', optional: type === 'optional', weight };
-                cat.items.push(newItem);
-                if (cl.userCategories) {
-                    const uc = cl.userCategories.find(c => c.id === catId);
-                    if (uc) uc.items.push(newItem);
-                }
-                persistData();
-                renderAll();
-            });
-        }
-
-        function showAddCategoryModal() {
-            const cl = getCurrentChecklist();
-            openModal('➕ Новая категория', `<div class="form-group"><label class="form-label">Название</label><input class="form-input modal-name" placeholder="Например: 🍔 Еда"></div>`, (modal) => {
-                const name = modal.querySelector('.modal-name').value.trim();
-                if (!name) { showToast('Введите название'); return false; }
-                const newCat = { id: 'cat_user_' + Date.now(), category: name, isDefault: false, items: [] };
-                cl.checklistData.push(newCat);
-                if (!cl.userCategories) cl.userCategories = [];
-                cl.userCategories.push(newCat);
-                persistData();
-                renderAll();
-            });
-        }
-
-        function updateCollapseButtons() {
-            const cl = getCurrentChecklist();
-            if (!cl) return;
-            const allCollapsed = cl.checklistData.every(c => cl.collapsedCategories[c.id]);
-            dom.collapseAllBtn.classList.toggle('hidden', allCollapsed);
-            dom.expandAllBtn.classList.toggle('hidden', !allCollapsed);
-        }
-
-        function collapseAll(doCollapse) {
-            const cl = getCurrentChecklist();
-            if (!cl) return;
-            cl.checklistData.forEach(c => { cl.collapsedCategories[c.id] = doCollapse; });
-            persistData();
-            renderAll();
-        }
-
-        function updateTripDate() {
-            const cl = getCurrentChecklist();
-            if (!cl) return;
-            cl.tripDate = dom.tripDateInput.value;
-            persistData();
-            renderCountdown();
-        }
-
-        function renderCountdown() {
-            const cl = getCurrentChecklist();
-            if (!cl || !cl.tripDate) { dom.countdownDisplay.textContent = ''; return; }
-            const now = new Date();
-            const trip = new Date(cl.tripDate);
-            const diff = Math.ceil((trip - now) / (1000 * 60 * 60 * 24));
-            if (diff > 0) dom.countdownDisplay.textContent = `До похода: ${diff} дн.`;
-            else if (diff === 0) dom.countdownDisplay.textContent = 'Поход сегодня!';
-            else dom.countdownDisplay.textContent = 'Поход завершён';
-        }
-
-        function renderAll() {
-            renderChecklistTabs();
-            const cl = getCurrentChecklist();
-            if (cl) {
-                dom.tripDateInput.value = cl.tripDate || '';
-                renderCountdown();
-            }
-            renderChecklist();
-            updateProgressAndWeight();
-        }
-
-        function renderApp() {
-            if (!appState.currentUser) { showLoginScreen(); return; }
-            dom.loginContainer.classList.add('hidden');
-            dom.mainContent.classList.remove('hidden');
-            dom.logoutBtn.classList.remove('hidden');
-            dom.syncBadge.classList.remove('hidden');
-            dom.usernameDisplay.textContent = appState.currentUser.username;
-            dom.userAvatar.textContent = appState.currentUser.username.charAt(0).toUpperCase();
-            dom.userEmailDisplay.textContent = appState.firebaseAvailable ? '☁️ Облако' : '💾 Локально';
-            dom.headerUserInfo.textContent = appState.currentUser.username;
-            dom.switchUserBtn.style.display = appState.currentUser.isGuest ? 'none' : 'inline-block';
-
-            dom.collapseAllBtn.classList.remove('hidden');
-            dom.expandAllBtn.classList.add('hidden');
-            dom.resetChecksBtn.classList.remove('hidden');
-            dom.exportBtn.classList.remove('hidden');
-            dom.importBtn.classList.remove('hidden');
-            dom.createSharedBtn.classList.toggle('hidden', !!appState.sharedSessionId);
-            dom.addCategoryBtn.classList.toggle('hidden', !!appState.sharedSessionId);
-            if (appState.firebaseAvailable) {
-                dom.createSharedBtn.classList.toggle('hidden', !!appState.sharedSessionId);
-            } else {
-                dom.createSharedBtn.classList.add('hidden');
-            }
-            renderAll();
-        }
-
-        function showLoginScreen() {
-            dom.mainContent.classList.add('hidden');
-            dom.loginContainer.classList.remove('hidden');
-            dom.logoutBtn.classList.add('hidden');
-            dom.syncBadge.classList.add('hidden');
-            dom.collapseAllBtn.classList.add('hidden');
-            dom.expandAllBtn.classList.add('hidden');
-            dom.resetChecksBtn.classList.add('hidden');
-            dom.exportBtn.classList.add('hidden');
-            dom.importBtn.classList.add('hidden');
-            dom.createSharedBtn.classList.add('hidden');
-            dom.headerUserInfo.textContent = '';
-            dom.usernameDisplay.textContent = 'Гость';
-            dom.userAvatar.textContent = '?';
-            dom.userEmailDisplay.textContent = '';
-            dom.switchUserBtn.style.display = 'none';
-            dom.alertBox.className = 'alert'; dom.alertBox.style.display = 'none';
-            dom.loginUsername.value = ''; dom.loginPassword.value = '';
-            dom.regUsername.value = ''; dom.regPassword.value = ''; dom.regPassword2.value = '';
-            dom.tabLogin.classList.remove('hidden'); dom.tabRegister.classList.add('hidden'); dom.tabJoin.classList.add('hidden');
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelector('[data-tab="login"]').classList.add('active');
-        }
-
-        // Обработчики
-        dom.loginBtn.addEventListener('click', handleLogin);
-        dom.registerBtn.addEventListener('click', handleRegister);
-        dom.logoutBtn.addEventListener('click', handleLogout);
-        dom.switchUserBtn.addEventListener('click', () => { handleLogout(); showLoginScreen(); });
-        dom.themeToggle.addEventListener('click', toggleTheme);
-        dom.collapseAllBtn.addEventListener('click', () => collapseAll(true));
-        dom.expandAllBtn.addEventListener('click', () => collapseAll(false));
-        dom.resetChecksBtn.addEventListener('click', resetChecks);
-        dom.exportBtn.addEventListener('click', exportChecklist);
-        dom.importBtn.addEventListener('click', () => dom.importFileInput.click());
-        dom.importFileInput.addEventListener('change', (e) => { if (e.target.files[0]) importChecklist(e.target.files[0]); });
-        dom.createSharedBtn.addEventListener('click', createSharedSession);
-        dom.copySharedLinkBtn.addEventListener('click', () => {
-            const link = `${window.location.origin}${window.location.pathname}?session=${appState.sharedSessionId}`;
-            navigator.clipboard.writeText(link).then(() => showToast('Ссылка скопирована!'));
-        });
-        dom.leaveSharedBtn.addEventListener('click', leaveSharedSession);
-        dom.addCategoryBtn.addEventListener('click', showAddCategoryModal);
-        dom.addChecklistBtn.addEventListener('click', () => {
-            const name = prompt('Название нового списка:', 'Поход ' + new Date().toLocaleDateString());
-            if (name) createNewChecklist(name);
-        });
-        dom.copyChecklistBtn.addEventListener('click', duplicateChecklist);
-        dom.renameChecklistBtn.addEventListener('click', () => {
-            const cl = getCurrentChecklist();
-            if (cl) { const newName = prompt('Новое имя:', cl.name); if (newName) renameChecklist(newName); }
-        });
-        dom.deleteChecklistBtn.addEventListener('click', deleteChecklist);
-        dom.tripDateInput.addEventListener('change', updateTripDate);
-        dom.searchInput.addEventListener('input', renderChecklist);
-        dom.filterSelect.addEventListener('change', renderChecklist);
-        dom.loginPassword.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleLogin(); });
-        dom.loginUsername.addEventListener('keydown', (e) => { if (e.key === 'Enter') dom.loginPassword.focus(); });
-        dom.regPassword2.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleRegister(); });
-
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                const tab = btn.dataset.tab;
-                dom.tabLogin.classList.toggle('hidden', tab !== 'login');
-                dom.tabRegister.classList.toggle('hidden', tab !== 'register');
-                dom.tabJoin.classList.toggle('hidden', tab !== 'join');
-                dom.alertBox.className = 'alert'; dom.alertBox.style.display = 'none';
-            });
-        });
-
-        dom.joinSessionBtn.addEventListener('click', () => {
-            const sessionId = dom.joinSessionId.value.trim();
-            const userName = dom.joinUserName.value.trim();
-            if (!sessionId || !userName) { showAlert('Введите ID и имя', 'error'); return; }
-            joinSharedSession(sessionId, userName);
-        });
-
-        // Проверка URL при загрузке
-        async function bootstrap() {
-            await initFirebase();
-            const urlParams = new URLSearchParams(window.location.search);
-            const sessionFromUrl = urlParams.get('session');
-            if (sessionFromUrl && appState.firebaseAvailable) {
-                dom.joinSessionId.value = sessionFromUrl;
-                document.querySelector('[data-tab="join"]').click();
-                showLoginScreen();
-                return;
             }
 
-            const localData = loadFromLocalStorage();
-            if (localData && localData.currentUsername) {
+            function getSharedParticipantsProgress() {
+                if (!appState.sharedSessionData || !appState.sharedSessionData.checklistData) return [];
+                const totalItems = appState.sharedSessionData.checklistData.reduce((sum, cat) => sum + cat.items.length,
+                    0);
+                const participants = appState.sharedSessionData.participants || {};
+                return Object.entries(participants).map(([name, data]) => {
+                    const checked = data.checkedItems || {};
+                    const done = Object.values(checked).filter(v => v).length;
+                    return {
+                        name,
+                        role: data.role || 'participant',
+                        done,
+                        total: totalItems,
+                        percent: totalItems ? Math.round((done / totalItems) * 100) : 0
+                    };
+                });
+            }
+
+            async function handleLogin() {
+                const username = dom.loginUsername.value.trim();
+                const password = dom.loginPassword.value;
+                if (!username || !password) { showAlert('Введите логин и пароль', 'error'); return; }
+                const passwordHash = hashPassword(password);
+
                 if (appState.firebaseAvailable) {
-                    const cloudData = await loadUserDataFromCloud(localData.currentUsername);
-                    if (cloudData && cloudData.passwordHash === localData.passwordHash) {
-                        appState.currentUser = { username: localData.currentUsername, passwordHash: localData.passwordHash };
+                    const cloudData = await loadUserDataFromCloud(username);
+                    if (cloudData && cloudData.passwordHash === passwordHash) {
+                        appState.currentUser = { username, passwordHash };
                         appState.checklists = cloudData.checklists || [];
                         appState.currentChecklistId = cloudData.currentChecklistId || appState.checklists[0]?.id;
                         appState.theme = cloudData.theme || 'light';
-                    } else {
-                        appState.currentUser = { username: localData.currentUsername, passwordHash: localData.passwordHash };
-                        appState.checklists = localData.checklists || [];
-                        appState.currentChecklistId = localData.currentChecklistId || appState.checklists[0]?.id;
-                        appState.theme = localData.theme || 'light';
+                        appState.sharedSessionsMeta = cloudData.sharedSessionsMeta || [];
+                        applyTheme();
+                        saveToLocalStorage();
+                        await loadSharedSessionsMeta();
+                        showAlert('✅ Вход (облако)', 'success');
+                        renderApp();
+                        return;
+                    } else if (cloudData && cloudData.passwordHash !== passwordHash) {
+                        showAlert('❌ Неверный пароль', 'error');
+                        return;
                     }
-                } else {
-                    appState.currentUser = { username: localData.currentUsername, passwordHash: localData.passwordHash };
+                }
+
+                const localData = loadFromLocalStorage();
+                if (localData && localData.currentUsername === username && localData.passwordHash === passwordHash) {
+                    appState.currentUser = { username, passwordHash };
                     appState.checklists = localData.checklists || [];
                     appState.currentChecklistId = localData.currentChecklistId || appState.checklists[0]?.id;
                     appState.theme = localData.theme || 'light';
+                    appState.sharedSessionsMeta = localData.sharedSessionsMeta || [];
+                    applyTheme();
+                    if (appState.firebaseAvailable) {
+                        await persistData();
+                        await loadSharedSessionsMeta();
+                    }
+                    showAlert('✅ Вход (локально)', 'success');
+                    renderApp();
+                    return;
                 }
-                if (appState.checklists.length === 0) createNewChecklist('Мой первый поход');
-                applyTheme();
-                if (appState.firebaseAvailable) await persistData();
-                renderApp();
-                return;
+
+                if (!appState.firebaseAvailable && !localData) {
+                    appState.currentUser = { username, passwordHash };
+                    appState.sharedSessionsMeta = [];
+                    createNewChecklist('Мой первый поход');
+                    applyTheme();
+                    showAlert('✅ Новый профиль', 'success');
+                    renderApp();
+                    return;
+                }
+                showAlert('❌ Неверный логин или пароль', 'error');
             }
-            showLoginScreen();
-        }
-        bootstrap().catch(err => { console.error(err); showLoginScreen(); });
-    })();
-</script>
+
+            async function handleRegister() {
+                const username = dom.regUsername.value.trim();
+                const password = dom.regPassword.value;
+                const password2 = dom.regPassword2.value;
+                if (username.length < 3) { showAlert('Логин не менее 3 символов', 'error'); return; }
+                if (password.length < 4) { showAlert('Пароль не менее 4 символов', 'error'); return; }
+                if (password !== password2) { showAlert('Пароли не совпадают', 'error'); return; }
+                const passwordHash = hashPassword(password);
+
+                if (appState.firebaseAvailable) {
+                    const existing = await loadUserDataFromCloud(username);
+                    if (existing) { showAlert('❌ Пользователь существует', 'error'); return; }
+                } else {
+                    const local = loadFromLocalStorage();
+                    if (local && local.currentUsername === username) { showAlert('❌ Пользователь существует локально',
+                            'error'); return; }
+                }
+
+                appState.currentUser = { username, passwordHash };
+                appState.checklists = [];
+                appState.sharedSessionsMeta = [];
+                createNewChecklist('Мой первый поход');
+                appState.theme = 'light';
+                applyTheme();
+                await persistData();
+                if (appState.firebaseAvailable) await loadSharedSessionsMeta();
+                showAlert('✅ Регистрация успешна!', 'success');
+                renderApp();
+            }
+
+            function handleLogout() {
+                if (appState.sharedSessionId) leaveSharedSession();
+                appState.currentUser = null;
+                appState.checklists = [];
+                appState.currentChecklistId = null;
+                appState.sharedSessionsMeta = [];
+                appState.isSharedChecklistActive = false;
+                appState.sharedSessionData = null;
+                appState.isAdminOfCurrentSession = false;
+                if (appState.sharedSessionUnsubscribe) { appState.sharedSessionUnsubscribe();
+                    appState.sharedSessionUnsubscribe = null; }
+                saveToLocalStorage();
+                dom.syncBadge.textContent = '💾 Локально';
+                dom.syncBadge.className = 'sync-badge';
+                showLoginScreen();
+            }
+
+            function applyTheme() {
+                document.body.classList.toggle('dark', appState.theme === 'dark');
+                localStorage.setItem('theme', appState.theme);
+            }
+
+            function toggleTheme() {
+                appState.theme = appState.theme === 'light' ? 'dark' : 'light';
+                applyTheme();
+                persistData();
+            }
+
+            function resetChecks() {
+                const cl = getCurrentChecklist();
+                if (!cl || cl.isShared) return;
+                confirmDelete('Снять все отметки в текущем списке?', () => {
+                    cl.selectedItems = {};
+                    persistData();
+                    renderAll();
+                    showToast('Отметки сброшены');
+                });
+            }
+
+            function exportChecklist() {
+                const cl = getCurrentChecklist();
+                if (!cl) return;
+                const data = { name: cl.name, checklistData: cl.checklistData, userCategories: cl.userCategories || [] };
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'checklist_' + (cl.name || 'export').replace(/[^a-zA-Z0-9]/g, '_') + '.json';
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+
+            function importChecklist(file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        if (!data.checklistData) throw new Error();
+                        const newCL = {
+                            id: 'cl_import_' + Date.now(),
+                            name: data.name || 'Импортированный список',
+                            tripDate: '',
+                            checklistData: data.checklistData,
+                            userCategories: data.userCategories || [],
+                            selectedItems: {},
+                            collapsedCategories: {}
+                        };
+                        appState.checklists.push(newCL);
+                        appState.currentChecklistId = newCL.id;
+                        appState.isSharedChecklistActive = false;
+                        appState.sharedSessionId = null;
+                        persistData();
+                        renderAll();
+                        showToast('✅ Список импортирован!');
+                    } catch (ex) { showToast('Ошибка формата файла'); }
+                };
+                reader.readAsText(file);
+            }
+
+            function updateProgressAndWeight() {
+                const cl = getCurrentChecklist();
+                let selected = 0,
+                    total = 0,
+                    weight = 0;
+                if (cl) {
+                    cl.checklistData.forEach(cat => cat.items.forEach(item => {
+                        total++;
+                        if (cl.selectedItems[item.id]) { selected++;
+                            weight += (item.weight || 0); }
+                    }));
+                }
+                dom.selectedCount.textContent = selected;
+                dom.totalCount.textContent = total;
+                dom.progressFill.style.width = (total ? Math.round((selected / total) * 100) : 0) + '%';
+                dom.totalWeight.textContent = weight;
+            }
+
+            function getCategoryProgress(cat, selectedItems) {
+                const total = cat.items.length;
+                const done = cat.items.filter(i => selectedItems[i.id]).length;
+                return total ? `${done}/${total} (${Math.round(done/total*100)}%)` : '';
+            }
+
+            function renderChecklistTabs() {
+                dom.checklistTabs.innerHTML = '';
+                appState.checklists.forEach(cl => {
+                    const tab = document.createElement('div');
+                    const isActive = cl.id === appState.currentChecklistId && !appState
+                        .isSharedChecklistActive;
+                    tab.className = 'checklist-tab' + (isActive ? ' active' : '');
+                    tab.textContent = cl.name;
+                    tab.addEventListener('click', () => switchChecklist(cl.id));
+                    dom.checklistTabs.appendChild(tab);
+                });
+            }
+
+            function renderSharedChecklistTabs() {
+                dom.sharedChecklistTabs.innerHTML = '';
+                if (appState.sharedSessionsMeta.length === 0) {
+                    dom.sharedChecklistsSection.classList.add('hidden');
+                    return;
+                }
+                dom.sharedChecklistsSection.classList.remove('hidden');
+                appState.sharedSessionsMeta.forEach(session => {
+                    const tab = document.createElement('div');
+                    const isActive = appState.isSharedChecklistActive && appState.sharedSessionId === session
+                        .id;
+                    tab.className = 'checklist-tab shared-tab' + (isActive ? ' active' : '');
+                    tab.innerHTML =
+                        `👥 ${escapeHTML(session.name)} <span class="role-badge role-${session.role}" style="margin-left:4px;">${session.role}</span>`;
+                    tab.addEventListener('click', () => switchToSharedSession(session.id));
+                    dom.sharedChecklistTabs.appendChild(tab);
+                });
+            }
+
+            function renderChecklist() {
+                const cl = getCurrentChecklist();
+                if (!cl) { dom.checklistContent.innerHTML =
+                        '<p style="text-align:center;padding:40px;color:var(--text-light);">Нет активного списка</p>'; return; }
+                const searchTerm = dom.searchInput.value.toLowerCase();
+                const filter = dom.filterSelect.value;
+                const isShared = !!cl.isShared;
+                const isAdmin = appState.isAdminOfCurrentSession;
+
+                dom.checklistContent.innerHTML = '';
+                cl.checklistData.forEach(cat => {
+                    let filteredItems = cat.items;
+                    if (searchTerm) filteredItems = filteredItems.filter(i => i.text.toLowerCase().includes(
+                        searchTerm));
+                    if (filter === 'required') filteredItems = filteredItems.filter(i => i.required);
+                    if (filter === 'optional') filteredItems = filteredItems.filter(i => !i.required);
+                    if (filter === 'checked') filteredItems = filteredItems.filter(i => cl.selectedItems[i.id]);
+                    if (filter === 'unchecked') filteredItems = filteredItems.filter(i => !cl.selectedItems[i
+                        .id]);
+
+                    const isCollapsed = false;
+                    const card = document.createElement('div');
+                    card.className = 'category-card expanded';
+                    card.dataset.catId = cat.id;
+                    const allSelected = cat.items.length && cat.items.every(i => cl.selectedItems[i.id]);
+                    const progress = getCategoryProgress(cat, cl.selectedItems);
+                    card.innerHTML = `
+                        <div class="category-header" data-action="toggle-collapse">
+                            <div class="category-title">
+                                <span>${escapeHTML(cat.category)}</span>
+                                ${cat.isDefault ? '<span class="badge-default">базовая</span>' : ''}
+                                ${isShared ? '<span class="shared-indicator">👥 общий</span>' : ''}
+                            </div>
+                            <span class="category-progress">${progress}</span>
+                            <div class="category-actions">
+                                <button class="btn btn-sm btn-ghost" data-action="toggle-items">${allSelected ? '☑️ Снять все' : '☐ Выбрать все'}</button>
+                                ${!cat.isDefault && !isShared ? '<button class="btn-icon" data-action="delete-cat" style="color:var(--danger);">🗑️</button>' : ''}
+                                ${!cat.isDefault && isShared && isAdmin ? '<button class="btn-icon" data-action="delete-cat" style="color:var(--danger);">🗑️</button>' : ''}
+                                <span class="collapse-icon">▼</span>
+                            </div>
+                        </div>
+                        <div class="items-wrapper">
+                            <div class="items-grid" data-cat-id="${cat.id}">
+                                ${filteredItems.map(item => {
+                                    const checked = !!cl.selectedItems[item.id];
+                                    return `<div class="item-card" data-item-id="${item.id}">
+                                        <div class="item-checkbox ${checked ? 'checked' : ''}" data-action="toggle-item">${checked ? '✓' : ''}</div>
+                                        <div class="item-text" data-action="toggle-item">${escapeHTML(item.text)}</div>
+                                        ${item.weight ? `<span class="weight-badge" data-action="edit-weight">⚖️ ${item.weight}г</span>` : ''}
+                                        <span class="weight-badge" data-action="edit-weight" style="cursor:pointer;">⚖️</span>
+                                        ${item.optional ? '<span class="item-badge badge-optional">необяз.</span>' : ''}
+                                        ${item.required ? '<span class="item-badge badge-required">обяз.</span>' : ''}
+                                        ${!isShared || isAdmin ? '<button class="btn-icon item-delete-btn" data-action="delete-item" title="Удалить">🗑️</button>' : ''}
+                                    </div>`;
+                                }).join('')}
+                            </div>
+                            ${!isShared || isAdmin ? '<button class="add-item-btn" data-action="add-item">+ Добавить предмет</button>' : ''}
+                        </div>`;
+                    card.addEventListener('click', function(e) {
+                        const actionEl = e.target.closest('[data-action]');
+                        const action = actionEl?.dataset?.action;
+                        const itemCard = e.target.closest('.item-card');
+                        const itemId = itemCard?.dataset?.itemId;
+                        const collapseHeader = e.target.closest('.category-header');
+                        const isButton = !!e.target.closest('button');
+
+                        if (action === 'toggle-collapse' && !isButton && !itemCard) {
+                            const wrapper = card.querySelector('.items-wrapper');
+                            const isExpanded = card.classList.contains('expanded');
+                            if (isExpanded) {
+                                card.classList.remove('expanded');
+                            } else {
+                                card.classList.add('expanded');
+                            }
+                            return;
+                        }
+
+                        if (action === 'toggle-item' || (itemCard && !isButton && !action)) {
+                            if (itemId) {
+                                if (isShared) {
+                                    toggleSharedItem(itemId);
+                                } else {
+                                    toggleItem(itemId);
+                                }
+                            }
+                            return;
+                        }
+
+                        if (action === 'toggle-items') {
+                            if (isShared) {
+                                toggleAllSharedItems(cat.id, !allSelected);
+                            } else {
+                                toggleCategoryItems(cat.id, !allSelected);
+                            }
+                            return;
+                        }
+
+                        if (action === 'delete-cat') {
+                            deleteCategory(cat.id);
+                            return;
+                        }
+                        if (action === 'add-item') {
+                            showAddItemModal(cat.id);
+                            return;
+                        }
+                        if (action === 'delete-item' && itemId) {
+                            deleteItem(cat.id, itemId);
+                            return;
+                        }
+                        if (action === 'edit-weight' && itemId) {
+                            editItemWeight(cat.id, itemId);
+                            return;
+                        }
+                    });
+                    dom.checklistContent.appendChild(card);
+                });
+
+                document.querySelectorAll('.items-grid').forEach(grid => {
+                    if (grid.sortableInstance) grid.sortableInstance.destroy();
+                    if (!appState.isSharedChecklistActive || appState.isAdminOfCurrentSession) {
+                        grid.sortableInstance = new Sortable(grid, {
+                            group: 'items',
+                            animation: 150,
+                            ghostClass: 'sortable-ghost',
+                            handle: '.item-card',
+                            filter: 'button, .weight-badge',
+                            preventOnFilter: true,
+                            onEnd: function(evt) {
+                                const catId = evt.to.dataset.catId;
+                                const cat = cl.checklistData.find(c => c.id === catId);
+                                if (!cat) return;
+                                const movedItemId = evt.item.dataset.itemId;
+                                const oldIndex = evt.oldIndex;
+                                const newIndex = evt.newIndex;
+                                if (oldIndex !== newIndex && movedItemId) {
+                                    const item = cat.items.splice(oldIndex, 1)[0];
+                                    cat.items.splice(newIndex, 0, item);
+                                    if (isShared && appState.sharedSessionId && appState
+                                        .firebaseAvailable) {
+                                        appState.db.collection('sharedSessions').doc(appState
+                                            .sharedSessionId).update({
+                                            checklistData: cl.checklistData,
+                                            updatedAt: firebase.firestore.FieldValue
+                                                .serverTimestamp(),
+                                        }).catch(() => {});
+                                    } else {
+                                        persistData();
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
+
+                updateProgressAndWeight();
+                renderSharedSessionBox();
+            }
+
+            function renderSharedSessionBox() {
+                if (appState.isSharedChecklistActive && appState.sharedSessionData) {
+                    dom.sharedSessionBox.classList.remove('hidden');
+                    dom.manageSharedBtn.classList.toggle('hidden', !appState.isAdminOfCurrentSession);
+                    const participants = getSharedParticipantsProgress();
+                    dom.sharedParticipants.innerHTML = participants.map(p => `
+                        <div class="participant-row">
+                            <span class="participant-name">
+                                ${escapeHTML(p.name)}
+                                <span class="role-badge role-${p.role}">${p.role}</span>
+                            </span>
+                            <span class="participant-progress">${p.done}/${p.total} (${p.percent}%)</span>
+                        </div>
+                    `).join('') || '<p style="color:var(--text-light);font-size:0.85rem;">Нет данных об участниках</p>';
+                } else {
+                    dom.sharedSessionBox.classList.add('hidden');
+                    dom.manageSharedBtn.classList.add('hidden');
+                }
+            }
+
+            function toggleItem(itemId) {
+                const cl = getCurrentChecklist();
+                if (!cl || cl.isShared) return;
+                cl.selectedItems[itemId] = !cl.selectedItems[itemId];
+                persistData();
+                renderAll();
+            }
+
+            function toggleCategoryItems(catId, selectAll) {
+                const cl = getCurrentChecklist();
+                if (!cl || cl.isShared) return;
+                const cat = cl.checklistData.find(c => c.id === catId);
+                if (!cat) return;
+                cat.items.forEach(i => { cl.selectedItems[i.id] = selectAll; });
+                persistData();
+                renderAll();
+            }
+
+            function deleteItem(catId, itemId) {
+                const cl = getCurrentChecklist();
+                const cat = cl.checklistData.find(c => c.id === catId);
+                if (!cat) return;
+                const item = cat.items.find(i => i.id === itemId);
+                if (!item) return;
+                confirmDelete(`Удалить «${item.text}»?`, () => {
+                    cat.items = cat.items.filter(i => i.id !== itemId);
+                    delete cl.selectedItems[itemId];
+                    const uc = cl.userCategories?.find(c => c.id === catId);
+                    if (uc) uc.items = uc.items.filter(i => i.id !== itemId);
+                    if (cl.isShared && appState.sharedSessionId && appState.firebaseAvailable) {
+                        appState.db.collection('sharedSessions').doc(appState.sharedSessionId).update({
+                            checklistData: cl.checklistData,
+                            userCategories: cl.userCategories || [],
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        }).catch(() => {});
+                    }
+                    persistData();
+                    renderAll();
+                });
+            }
+
+            function deleteCategory(catId) {
+                const cl = getCurrentChecklist();
+                const cat = cl.checklistData.find(c => c.id === catId);
+                if (!cat || cat.isDefault) { showToast('Базовые категории нельзя удалить'); return; }
+                confirmDelete(`Удалить категорию «${cat.category}»?`, () => {
+                    cl.checklistData = cl.checklistData.filter(c => c.id !== catId);
+                    cl.userCategories = (cl.userCategories || []).filter(c => c.id !== catId);
+                    cat.items.forEach(i => delete cl.selectedItems[i.id]);
+                    if (cl.isShared && appState.sharedSessionId && appState.firebaseAvailable) {
+                        appState.db.collection('sharedSessions').doc(appState.sharedSessionId).update({
+                            checklistData: cl.checklistData,
+                            userCategories: cl.userCategories || [],
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        }).catch(() => {});
+                    }
+                    persistData();
+                    renderAll();
+                });
+            }
+
+            function editItemWeight(catId, itemId) {
+                const cl = getCurrentChecklist();
+                const cat = cl.checklistData.find(c => c.id === catId);
+                const item = cat?.items.find(i => i.id === itemId);
+                if (!item) return;
+                const newWeight = prompt('Вес в граммах (0 - не указан):', item.weight || 0);
+                if (newWeight !== null && !isNaN(newWeight) && newWeight >= 0) {
+                    item.weight = Math.max(0, parseInt(newWeight) || 0);
+                    if (cl.isShared && appState.sharedSessionId && appState.firebaseAvailable) {
+                        appState.db.collection('sharedSessions').doc(appState.sharedSessionId).update({
+                            checklistData: cl.checklistData,
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        }).catch(() => {});
+                    }
+                    persistData();
+                    renderAll();
+                }
+            }
+
+            function showAddItemModal(catId) {
+                const cl = getCurrentChecklist();
+                const cat = cl.checklistData.find(c => c.id === catId);
+                if (!cat) return;
+                openModal(`➕ Элемент в «${cat.category}»`, `
+                    <div class="form-group"><label class="form-label">Название</label><input class="form-input modal-name" placeholder="Название"></div>
+                    <div class="form-group"><label class="form-label">Тип</label><select class="form-input modal-type"><option value="required">Обязательный</option><option value="optional">Необязательный</option></select></div>
+                    <div class="form-group"><label class="form-label">Вес (г)</label><input class="form-input modal-weight" type="number" value="0" min="0"></div>
+                `, (modal) => {
+                    const name = modal.querySelector('.modal-name').value.trim();
+                    if (!name) { showToast('Введите название'); return false; }
+                    const type = modal.querySelector('.modal-type').value;
+                    const weight = parseInt(modal.querySelector('.modal-weight').value) || 0;
+                    const newItem = { id: 'item_' + Date.now(), text: name, required: type === 'required',
+                        optional: type === 'optional', weight };
+                    cat.items.push(newItem);
+                    if (cl.userCategories) {
+                        const uc = cl.userCategories.find(c => c.id === catId);
+                        if (uc) uc.items.push(newItem);
+                    }
+                    if (cl.isShared && appState.sharedSessionId && appState.firebaseAvailable) {
+                        appState.db.collection('sharedSessions').doc(appState.sharedSessionId).update({
+                            checklistData: cl.checklistData,
+                            userCategories: cl.userCategories || [],
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        }).catch(() => {});
+                    }
+                    persistData();
+                    renderAll();
+                });
+            }
+
+            function showAddCategoryModal() {
+                const cl = getCurrentChecklist();
+                if (!cl || cl.isShared) return;
+                openModal('➕ Новая категория',
+                    `<div class="form-group"><label class="form-label">Название</label><input class="form-input modal-name" placeholder="Например: 🍔 Еда"></div>`,
+                    (modal) => {
+                        const name = modal.querySelector('.modal-name').value.trim();
+                        if (!name) { showToast('Введите название'); return false; }
+                        const newCat = { id: 'cat_user_' + Date.now(), category: name, isDefault: false,
+                            items: [] };
+                        cl.checklistData.push(newCat);
+                        if (!cl.userCategories) cl.userCategories = [];
+                        cl.userCategories.push(newCat);
+                        persistData();
+                        renderAll();
+                    });
+            }
+
+            function updateTripDate() {
+                const cl = getCurrentChecklist();
+                if (!cl || cl.isShared) return;
+                const personalCl = appState.checklists.find(c => c.id === appState.currentChecklistId);
+                if (personalCl) {
+                    personalCl.tripDate = dom.tripDateInput.value;
+                    persistData();
+                    renderCountdown();
+                }
+            }
+
+            function renderCountdown() {
+                const cl = getCurrentChecklist();
+                if (!cl || cl.isShared) { dom.countdownDisplay.textContent = ''; return; }
+                const personalCl = appState.checklists.find(c => c.id === appState.currentChecklistId);
+                if (!personalCl || !personalCl.tripDate) { dom.countdownDisplay.textContent = ''; return; }
+                const now = new Date();
+                const trip = new Date(personalCl.tripDate);
+                const diff = Math.ceil((trip - now) / (1000 * 60 * 60 * 24));
+                if (diff > 0) dom.countdownDisplay.textContent = `До похода: ${diff} дн.`;
+                else if (diff === 0) dom.countdownDisplay.textContent = 'Поход сегодня!';
+                else dom.countdownDisplay.textContent = 'Поход завершён';
+            }
+
+            function renderAll() {
+                renderChecklistTabs();
+                renderSharedChecklistTabs();
+                const cl = getCurrentChecklist();
+                if (cl && !cl.isShared) {
+                    const personalCl = appState.checklists.find(c => c.id === appState.currentChecklistId);
+                    dom.tripDateInput.value = personalCl?.tripDate || '';
+                    dom.tripDateInput.disabled = false;
+                    renderCountdown();
+                } else if (cl && cl.isShared) {
+                    dom.tripDateInput.value = '';
+                    dom.tripDateInput.disabled = true;
+                    dom.countdownDisplay.textContent = '';
+                }
+                renderChecklist();
+                updateProgressAndWeight();
+                updateUIForMode();
+            }
+
+            function updateUIForMode() {
+                const isShared = appState.isSharedChecklistActive;
+                dom.sharedIndicator.classList.toggle('hidden', !isShared);
+                dom.createSharedBtn.classList.toggle('hidden', isShared || !appState.firebaseAvailable);
+                dom.addCategoryBtn.classList.toggle('hidden', isShared);
+                dom.resetChecksBtn.classList.toggle('hidden', isShared);
+                dom.collapseAllBtn.classList.remove('hidden');
+                dom.expandAllBtn.classList.add('hidden');
+                dom.exportBtn.classList.remove('hidden');
+                dom.importBtn.classList.toggle('hidden', isShared);
+                dom.addChecklistBtn.classList.toggle('hidden', isShared);
+                dom.copyChecklistBtn.classList.toggle('hidden', isShared);
+                dom.renameChecklistBtn.classList.toggle('hidden', isShared);
+                dom.deleteChecklistBtn.classList.toggle('hidden', isShared);
+                dom.manageSharedBtn.classList.toggle('hidden', !isShared || !appState.isAdminOfCurrentSession);
+            }
+
+            function renderApp() {
+                if (!appState.currentUser) { showLoginScreen(); return; }
+                dom.loginContainer.classList.add('hidden');
+                dom.mainContent.classList.remove('hidden');
+                dom.logoutBtn.classList.remove('hidden');
+                dom.syncBadge.classList.remove('hidden');
+                dom.usernameDisplay.textContent = appState.currentUser.username;
+                dom.userAvatar.textContent = appState.currentUser.username.charAt(0).toUpperCase();
+                dom.userEmailDisplay.textContent = appState.firebaseAvailable ? '☁️ Облако' : '💾 Локально';
+                dom.headerUserInfo.textContent = appState.currentUser.username;
+                dom.switchUserBtn.style.display = appState.currentUser.isGuest ? 'none' : 'inline-block';
+                if (appState.firebaseAvailable) {
+                    dom.syncBadge.textContent = '☁️ Облако';
+                    dom.syncBadge.className = 'sync-badge synced';
+                    dom.createSharedBtn.classList.toggle('hidden', appState.isSharedChecklistActive);
+                } else {
+                    dom.syncBadge.textContent = '💾 Локально';
+                    dom.syncBadge.className = 'sync-badge';
+                    dom.createSharedBtn.classList.add('hidden');
+                }
+                if (!appState.currentChecklistId && appState.checklists.length > 0 && !appState.isSharedChecklistActive) {
+                    appState.currentChecklistId = appState.checklists[0].id;
+                }
+                renderAll();
+            }
+
+            function showLoginScreen() {
+                dom.mainContent.classList.add('hidden');
+                dom.loginContainer.classList.remove('hidden');
+                dom.logoutBtn.classList.add('hidden');
+                dom.syncBadge.classList.add('hidden');
+                dom.sharedIndicator.classList.add('hidden');
+                dom.collapseAllBtn.classList.add('hidden');
+                dom.expandAllBtn.classList.add('hidden');
+                dom.resetChecksBtn.classList.add('hidden');
+                dom.exportBtn.classList.add('hidden');
+                dom.importBtn.classList.add('hidden');
+                dom.createSharedBtn.classList.add('hidden');
+                dom.sharedSessionBox.classList.add('hidden');
+                dom.manageSharedBtn.classList.add('hidden');
+                dom.sharedChecklistsSection.classList.add('hidden');
+                dom.headerUserInfo.textContent = '';
+                dom.usernameDisplay.textContent = 'Гость';
+                dom.userAvatar.textContent = '?';
+                dom.userEmailDisplay.textContent = '';
+                dom.switchUserBtn.style.display = 'none';
+                dom.alertBox.className = 'alert';
+                dom.alertBox.style.display = 'none';
+                dom.loginUsername.value = '';
+                dom.loginPassword.value = '';
+                dom.regUsername.value = '';
+                dom.regPassword.value = '';
+                dom.regPassword2.value = '';
+                dom.joinSessionId.value = '';
+                dom.joinUserName.value = '';
+                dom.tabLogin.classList.remove('hidden');
+                dom.tabRegister.classList.add('hidden');
+                dom.tabJoin.classList.add('hidden');
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                const loginTabBtn = document.querySelector('[data-tab="login"]');
+                if (loginTabBtn) loginTabBtn.classList.add('active');
+                dom.checklistTabs.innerHTML = '';
+                dom.sharedChecklistTabs.innerHTML = '';
+                dom.checklistContent.innerHTML = '';
+            }
+
+            dom.loginBtn.addEventListener('click', handleLogin);
+            dom.registerBtn.addEventListener('click', handleRegister);
+            dom.logoutBtn.addEventListener('click', handleLogout);
+            dom.switchUserBtn.addEventListener('click', () => { handleLogout();
+                showLoginScreen(); });
+            dom.themeToggle.addEventListener('click', toggleTheme);
+            dom.collapseAllBtn.addEventListener('click', () => {
+                document.querySelectorAll('.category-card').forEach(c => c.classList.remove('expanded'));
+                dom.collapseAllBtn.classList.add('hidden');
+                dom.expandAllBtn.classList.remove('hidden');
+            });
+            dom.expandAllBtn.addEventListener('click', () => {
+                document.querySelectorAll('.category-card').forEach(c => c.classList.add('expanded'));
+                dom.expandAllBtn.classList.add('hidden');
+                dom.collapseAllBtn.classList.remove('hidden');
+            });
+            dom.resetChecksBtn.addEventListener('click', resetChecks);
+            dom.exportBtn.addEventListener('click', exportChecklist);
+            dom.importBtn.addEventListener('click', () => dom.importFileInput.click());
+            dom.importFileInput.addEventListener('change', (e) => { if (e.target.files[0]) importChecklist(e.target
+                    .files[0]);
+                e.target.value = ''; });
+            dom.createSharedBtn.addEventListener('click', createSharedSession);
+            dom.copySharedLinkBtn.addEventListener('click', () => {
+                const link =
+                    `${window.location.origin}${window.location.pathname}?session=${appState.sharedSessionId}`;
+                navigator.clipboard.writeText(link).then(() => showToast('🔗 Ссылка скопирована!'));
+            });
+            dom.manageSharedBtn.addEventListener('click', showManageSharedModal);
+            dom.leaveSharedBtn.addEventListener('click', () => {
+                confirmDelete('Выйти из совместного похода?', leaveSharedSession);
+            });
+            dom.addCategoryBtn.addEventListener('click', showAddCategoryModal);
+            dom.addChecklistBtn.addEventListener('click', () => {
+                const name = prompt('Название нового списка:', 'Поход ' + new Date().toLocaleDateString());
+                if (name) createNewChecklist(name);
+            });
+            dom.copyChecklistBtn.addEventListener('click', duplicateChecklist);
+            dom.renameChecklistBtn.addEventListener('click', () => {
+                const cl = appState.checklists.find(c => c.id === appState.currentChecklistId);
+                if (cl) { const newName = prompt('Новое имя:', cl.name); if (newName) renameChecklist(newName); }
+            });
+            dom.deleteChecklistBtn.addEventListener('click', deleteChecklist);
+            dom.tripDateInput.addEventListener('change', updateTripDate);
+            dom.searchInput.addEventListener('input', () => renderChecklist());
+            dom.filterSelect.addEventListener('change', () => renderChecklist());
+            dom.refreshSharedBtn.addEventListener('click', async () => {
+                if (appState.firebaseAvailable) await loadSharedSessionsMeta();
+                showToast('🔄 Список обновлён');
+            });
+            dom.loginPassword.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleLogin(); });
+            dom.loginUsername.addEventListener('keydown', (e) => { if (e.key === 'Enter') dom.loginPassword.focus(); });
+            dom.regPassword2.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleRegister(); });
+            dom.joinSessionId.addEventListener('keydown', (e) => { if (e.key === 'Enter') dom.joinUserName.focus(); });
+            dom.joinUserName.addEventListener('keydown', (e) => { if (e.key === 'Enter') {
+                    const sessionId = dom.joinSessionId.value.trim();
+                    const userName = dom.joinUserName.value.trim();
+                    if (sessionId && userName) joinSharedSession(sessionId, userName);
+                } });
+
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove(
+                    'active'));
+                    btn.classList.add('active');
+                    const tab = btn.dataset.tab;
+                    dom.tabLogin.classList.toggle('hidden', tab !== 'login');
+                    dom.tabRegister.classList.toggle('hidden', tab !== 'register');
+                    dom.tabJoin.classList.toggle('hidden', tab !== 'join');
+                    dom.alertBox.className = 'alert';
+                    dom.alertBox.style.display = 'none';
+                });
+            });
+
+            dom.joinSessionBtn.addEventListener('click', () => {
+                const sessionId = dom.joinSessionId.value.trim();
+                const userName = dom.joinUserName.value.trim();
+                if (!sessionId || !userName) { showAlert('Введите ID сессии и ваше имя', 'error'); return; }
+                joinSharedSession(sessionId, userName);
+            });
+
+            async function bootstrap() {
+                await initFirebase();
+                const urlParams = new URLSearchParams(window.location.search);
+                const sessionFromUrl = urlParams.get('session');
+                if (sessionFromUrl && appState.firebaseAvailable) {
+                    dom.joinSessionId.value = sessionFromUrl;
+                    const joinTabBtn = document.querySelector('[data-tab="join"]');
+                    if (joinTabBtn) joinTabBtn.click();
+                    showLoginScreen();
+                    return;
+                }
+
+                const localData = loadFromLocalStorage();
+                if (localData && localData.currentUsername) {
+                    if (appState.firebaseAvailable) {
+                        const cloudData = await loadUserDataFromCloud(localData.currentUsername);
+                        if (cloudData && cloudData.passwordHash === localData.passwordHash) {
+                            appState.currentUser = { username: localData.currentUsername, passwordHash: localData
+                                    .passwordHash };
+                            appState.checklists = cloudData.checklists || [];
+                            appState.currentChecklistId = cloudData.currentChecklistId || appState.checklists[0]
+                                ?.id;
+                            appState.theme = cloudData.theme || 'light';
+                            appState.sharedSessionsMeta = cloudData.sharedSessionsMeta || [];
+                        } else {
+                            appState.currentUser = { username: localData.currentUsername, passwordHash: localData
+                                    .passwordHash };
+                            appState.checklists = localData.checklists || [];
+                            appState.currentChecklistId = localData.currentChecklistId || appState.checklists[0]
+                                ?.id;
+                            appState.theme = localData.theme || 'light';
+                            appState.sharedSessionsMeta = localData.sharedSessionsMeta || [];
+                        }
+                    } else {
+                        appState.currentUser = { username: localData.currentUsername, passwordHash: localData
+                                .passwordHash };
+                        appState.checklists = localData.checklists || [];
+                        appState.currentChecklistId = localData.currentChecklistId || appState.checklists[0]?.id;
+                        appState.theme = localData.theme || 'light';
+                        appState.sharedSessionsMeta = localData.sharedSessionsMeta || [];
+                    }
+                    if (appState.checklists.length === 0) createNewChecklist('Мой первый поход');
+                    if (!appState.currentChecklistId && appState.checklists.length > 0) {
+                        appState.currentChecklistId = appState.checklists[0].id;
+                    }
+                    applyTheme();
+                    if (appState.firebaseAvailable) {
+                        await persistData();
+                        await loadSharedSessionsMeta();
+                    }
+                    renderApp();
+                    return;
+                }
+                showLoginScreen();
+            }
+            bootstrap().catch(err => { console.error(err);
+                showLoginScreen(); });
+        })();
+    </script>
 </body>
 </html>
