@@ -223,6 +223,10 @@
             background: var(--card-hover-bg);
             color: var(--primary);
         }
+        .collapse-toggle {
+            padding: 6px 8px;
+            font-size: 0.9rem;
+        }
         .sync-badge {
             display: inline-flex;
             align-items: center;
@@ -256,7 +260,7 @@
             display: none !important;
         }
 
-        /* trip-selector – новая панель выбора похода над поиском */
+        /* trip-selector – панель выбора похода над поиском */
         .trip-selector {
             background: var(--card-bg);
             border-radius: var(--radius);
@@ -804,8 +808,6 @@
                 <span class="sync-badge hidden" id="sharedIndicator" style="background:var(--shared-badge-bg);color:var(--shared-badge-text);">👥 Совместно</span>
                 <span id="headerUserInfo" style="font-weight:600;"></span>
                 <button class="btn btn-sm btn-outline" id="themeToggle" title="Тёмная/светлая тема">🌓</button>
-                <button class="btn btn-sm btn-outline hidden" id="collapseAllBtn">📁 Свернуть</button>
-                <button class="btn btn-sm btn-outline hidden" id="expandAllBtn">📂 Развернуть</button>
                 <button class="btn btn-sm btn-outline hidden" id="exportBtn">📤 Экспорт</button>
                 <button class="btn btn-sm btn-outline hidden" id="importBtn">📥 Импорт</button>
                 <button class="btn btn-sm btn-outline hidden" id="createSharedBtn">👥 Совместный</button>
@@ -849,7 +851,7 @@
                 </div>
             </div>
 
-            <!-- Поиск и фильтр -->
+            <!-- Поиск и фильтр + кнопки свернуть/развернуть -->
             <div class="search-filter-bar">
                 <input type="text" class="search-input" id="searchInput" placeholder="🔍 Поиск по названию...">
                 <select class="filter-select" id="filterSelect">
@@ -859,6 +861,8 @@
                     <option value="checked">Отмеченные</option>
                     <option value="unchecked">Неотмеченные</option>
                 </select>
+                <button class="btn btn-sm btn-ghost collapse-toggle" id="collapseAllBtn" title="Свернуть все">📁</button>
+                <button class="btn btn-sm btn-ghost collapse-toggle hidden" id="expandAllBtn" title="Развернуть все">📂</button>
             </div>
 
             <!-- Список категорий -->
@@ -1363,7 +1367,20 @@
                     if (!doc.exists) { showToast('Сессия не найдена'); return; }
                     const data = doc.data();
                     if (!data.participants) data.participants = {};
-                    if (data.participants[userName]) { showToast('Имя занято в этой сессии'); return; }
+
+                    // Если участник с таким именем уже есть
+                    if (data.participants[userName]) {
+                        if (appState.currentUser && appState.currentUser.username === userName) {
+                            // Это текущий пользователь – просто переключаемся
+                            switchToSharedSession(sessionId);
+                            showToast('Вы уже участник этой сессии');
+                            return;
+                        } else {
+                            showToast('Имя занято другим участником');
+                            return;
+                        }
+                    }
+
                     data.participants[userName] = { name: userName, role: 'participant', checkedItems: {} };
                     await docRef.update({
                         participants: data.participants,
@@ -1381,6 +1398,28 @@
                     renderApp();
                     showToast('✅ Вы присоединились!');
                 } catch (e) { showToast('Ошибка: ' + e.message); }
+            }
+
+            async function autoJoinSharedSession(sessionId) {
+                if (!appState.firebaseAvailable || !appState.currentUser) return;
+                try {
+                    const doc = await appState.db.collection('sharedSessions').doc(sessionId).get();
+                    if (!doc.exists) {
+                        showToast('Сессия не найдена');
+                        return;
+                    }
+                    const data = doc.data();
+                    const myName = appState.currentUser.username;
+                    if (data.participants?.[myName]) {
+                        // Уже участник – просто переключаемся
+                        switchToSharedSession(sessionId);
+                    } else {
+                        // Пытаемся присоединиться
+                        await joinSharedSession(sessionId, myName);
+                    }
+                } catch (e) {
+                    showToast('Ошибка подключения к сессии: ' + e.message);
+                }
             }
 
             function subscribeToSharedSession(sessionId) {
@@ -1657,7 +1696,7 @@
                 appState.checklists = [];
                 appState.sharedSessionsMeta = [];
                 createNewChecklist('Мой первый поход');
-                appState.theme = 'light';
+                // Тема сохраняется та, что была выбрана пользователем до регистрации (уже в appState.theme)
                 applyTheme();
                 await persistData();
                 if (appState.firebaseAvailable) await loadSharedSessionsMeta();
@@ -2097,6 +2136,7 @@
                 dom.addCategoryBtn.classList.toggle('hidden', isShared);
                 dom.exportBtn.classList.remove('hidden');
                 dom.importBtn.classList.toggle('hidden', isShared);
+                // Свернуть/развернуть показываем всегда, кроме экрана входа
                 dom.collapseAllBtn.classList.remove('hidden');
                 dom.expandAllBtn.classList.add('hidden');
             }
@@ -2232,34 +2272,72 @@
                 await initFirebase();
                 const urlParams = new URLSearchParams(window.location.search);
                 const sessionFromUrl = urlParams.get('session');
+
+                // Если есть сессия в URL
                 if (sessionFromUrl && appState.firebaseAvailable) {
-                    dom.joinSessionId.value = sessionFromUrl;
-                    document.querySelector('[data-tab="join"]')?.click();
-                    showLoginScreen();
-                    return;
+                    // Сначала пытаемся восстановить локальную сессию
+                    const localData = loadFromLocalStorage();
+                    if (localData?.currentUsername) {
+                        // Есть сохранённый пользователь
+                        if (appState.firebaseAvailable) {
+                            const cloudData = await loadUserDataFromCloud(localData.currentUsername);
+                            if (cloudData && cloudData.passwordHash === localData.passwordHash) {
+                                appState.currentUser = { username: localData.currentUsername, passwordHash: localData.passwordHash };
+                                appState.checklists = cloudData.checklists || [];
+                                appState.currentChecklistId = cloudData.currentChecklistId || appState.checklists[0]?.id;
+                                appState.theme = cloudData.theme || 'light';
+                                appState.sharedSessionsMeta = cloudData.sharedSessionsMeta || [];
+                            } else {
+                                appState.currentUser = { username: localData.currentUsername, passwordHash: localData.passwordHash };
+                                appState.checklists = localData.checklists || [];
+                                appState.currentChecklistId = localData.currentChecklistId || appState.checklists[0]?.id;
+                                appState.theme = localData.theme || 'light';
+                                appState.sharedSessionsMeta = localData.sharedSessionsMeta || [];
+                            }
+                        } else {
+                            appState.currentUser = { username: localData.currentUsername, passwordHash: localData.passwordHash };
+                            appState.checklists = localData.checklists || [];
+                            appState.currentChecklistId = localData.currentChecklistId || appState.checklists[0]?.id;
+                            appState.theme = localData.theme || 'light';
+                            appState.sharedSessionsMeta = localData.sharedSessionsMeta || [];
+                        }
+                        if (appState.checklists.length === 0) createNewChecklist('Мой первый поход');
+                        if (!appState.currentChecklistId && appState.checklists.length > 0)
+                            appState.currentChecklistId = appState.checklists[0].id;
+                        applyTheme();
+                        if (appState.firebaseAvailable) { await persistData(); await loadSharedSessionsMeta(); }
+                        // Автоматически присоединяемся к сессии
+                        await autoJoinSharedSession(sessionFromUrl);
+                        return;
+                    } else {
+                        // Пользователь не авторизован – показываем экран входа с заполненной вкладкой "Совместный поход"
+                        dom.joinSessionId.value = sessionFromUrl;
+                        document.querySelector('[data-tab="join"]')?.click();
+                        showLoginScreen();
+                        return;
+                    }
                 }
+
+                // Обычный запуск без сессии в URL
                 const localData = loadFromLocalStorage();
                 if (localData?.currentUsername) {
                     if (appState.firebaseAvailable) {
                         const cloudData = await loadUserDataFromCloud(localData.currentUsername);
                         if (cloudData && cloudData.passwordHash === localData.passwordHash) {
-                            appState.currentUser = { username: localData.currentUsername, passwordHash: localData
-                                    .passwordHash };
+                            appState.currentUser = { username: localData.currentUsername, passwordHash: localData.passwordHash };
                             appState.checklists = cloudData.checklists || [];
                             appState.currentChecklistId = cloudData.currentChecklistId || appState.checklists[0]?.id;
                             appState.theme = cloudData.theme || 'light';
                             appState.sharedSessionsMeta = cloudData.sharedSessionsMeta || [];
                         } else {
-                            appState.currentUser = { username: localData.currentUsername, passwordHash: localData
-                                    .passwordHash };
+                            appState.currentUser = { username: localData.currentUsername, passwordHash: localData.passwordHash };
                             appState.checklists = localData.checklists || [];
                             appState.currentChecklistId = localData.currentChecklistId || appState.checklists[0]?.id;
                             appState.theme = localData.theme || 'light';
                             appState.sharedSessionsMeta = localData.sharedSessionsMeta || [];
                         }
                     } else {
-                        appState.currentUser = { username: localData.currentUsername, passwordHash: localData
-                                .passwordHash };
+                        appState.currentUser = { username: localData.currentUsername, passwordHash: localData.passwordHash };
                         appState.checklists = localData.checklists || [];
                         appState.currentChecklistId = localData.currentChecklistId || appState.checklists[0]?.id;
                         appState.theme = localData.theme || 'light';
@@ -2269,8 +2347,7 @@
                     if (!appState.currentChecklistId && appState.checklists.length > 0)
                         appState.currentChecklistId = appState.checklists[0].id;
                     applyTheme();
-                    if (appState.firebaseAvailable) { await persistData();
-                        await loadSharedSessionsMeta(); }
+                    if (appState.firebaseAvailable) { await persistData(); await loadSharedSessionsMeta(); }
                     renderApp();
                     return;
                 }
